@@ -1,0 +1,4 @@
+CV de Thomas Bernard
+Email: thomas.bernard@email.fr
+Tel: 06 12 34 56 78
+Bio: Développeur Fullstack passionné par Python, Django et l'écosystème React. 3 ans d'expérience dans des startups dynamiques, rigoureux et adepte du code propre.

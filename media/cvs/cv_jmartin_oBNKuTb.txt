@@ -1,0 +1,4 @@
+CV de Julien Martin
+Email: julien.martin@email.fr
+Tel: 07 45 67 89 01
+Bio: Développeur Frontend enthousiaste, sensible au design, à l'expérience utilisateur (UX) et aux performances web modernes avec React et Vue.js.

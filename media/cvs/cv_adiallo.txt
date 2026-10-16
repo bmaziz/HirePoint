@@ -1,0 +1,4 @@
+CV de Amina Diallo
+Email: amina.diallo@email.fr
+Tel: 06 55 44 33 22
+Bio: Ingénieure DevOps orientée automatisation, Docker, Kubernetes et sécurité Cloud. Passionnée par la culture CI/CD et l'infrastructure as Code.
