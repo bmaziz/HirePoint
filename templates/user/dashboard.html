@@ -1,0 +1,426 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Tableau de bord - HirePoint{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <!-- Header de bienvenue personnalisé -->
+    <div class="dashboard-header" id="dashboard-header">
+        <div class="dashboard-user-info">
+            <div class="dashboard-avatar">
+                {{ user.username|slice:":1"|upper }}
+            </div>
+            <div>
+                <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                    <h1 class="dashboard-title">Bienvenue, {{ user.display_name }} !</h1>
+                    <span class="badge 
+                        {% if user.is_admin %}badge-admin
+                        {% elif user.is_entreprise %}badge-entreprise
+                        {% elif user.is_formateur %}badge-formateur
+                        {% else %}badge-candidat{% endif %}">
+                        {{ user.get_role_display }}
+                    </span>
+                </div>
+                <p class="dashboard-subtitle">
+                    <i class="fa-regular fa-calendar-check"></i> Membre depuis le {{ user.dateInscription|date:"d F Y" }} &bull; Espace {{ user.get_role_display }}
+                </p>
+            </div>
+        </div>
+        <div>
+            <a href="{% url 'profile' %}" class="btn btn-secondary btn-sm" style="background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.3);" id="dashboard-my-profile-btn">
+                <i class="fa-solid fa-user-gear"></i> Gérer mon profil
+            </a>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 1. VUE CANDIDAT                            -->
+    <!-- ========================================== -->
+    {% if user.is_candidat %}
+        <!-- KPIs Candidat -->
+        <div class="dashboard-kpis">
+            <div class="kpi-card">
+                <div class="kpi-icon" style="background: #dbeafe; color: #1d4ed8;">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </div>
+                <div>
+                    <div class="kpi-value">{{ candidatures_count }}</div>
+                    <div class="kpi-label">Candidatures envoyées</div>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon" style="background: #fef3c7; color: #b45309;">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+                <div>
+                    <div class="kpi-value">{{ inscriptions_count }}</div>
+                    <div class="kpi-label">Formations suivies</div>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon" style="background: #d1fae5; color: #047857;">
+                    <i class="fa-solid fa-award"></i>
+                </div>
+                <div>
+                    <div class="kpi-value">{{ certifications_count }}</div>
+                    <div class="kpi-label">Certifications obtenues</div>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon" style="background: #ede9fe; color: #6d28d9;">
+                    <i class="fa-solid fa-briefcase"></i>
+                </div>
+                <div>
+                    <div class="kpi-value">{{ offres_recentes.count }}</div>
+                    <div class="kpi-label">Nouvelles opportunités</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <!-- Candidatures Récentes -->
+            <div class="card">
+                <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h2 class="card-title" style="font-size: 1.25rem;"><i class="fa-solid fa-list-check" style="color: var(--primary);"></i> Mes Candidatures Récentes</h2>
+                        <p class="card-subtitle">Suivez en temps réel l'avancement de vos postulations</p>
+                    </div>
+                </div>
+
+                {% if candidatures %}
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Poste visé</th>
+                                <th>Entreprise</th>
+                                <th>Date</th>
+                                <th>Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for c in candidatures %}
+                            <tr>
+                                <td style="font-weight: 700;">{{ c.offre.titre }}</td>
+                                <td>{{ c.offre.entreprise.nomEntreprise }}</td>
+                                <td>{{ c.dateCandidature|date:"d/m/Y" }}</td>
+                                <td>
+                                    <span class="badge 
+                                        {% if c.statut == 'ACCEPTEE' %}badge-status-accepted
+                                        {% elif c.statut == 'REFUSEE' %}badge-status-refused
+                                        {% else %}badge-status-waiting{% endif %}">
+                                        {{ c.get_statut_display }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <i class="fa-solid fa-file-circle-question empty-state-icon"></i>
+                    <p class="empty-state-text">Vous n'avez pas encore postulé à une offre d'emploi.</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Colonne latérale: Formations et Recommandations -->
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                <div class="card">
+                    <h3 class="card-title" style="font-size: 1.15rem; margin-bottom: 1rem;">
+                        <i class="fa-solid fa-book-open" style="color: var(--secondary);"></i> Mes Formations
+                    </h3>
+                    {% if inscriptions %}
+                        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                            {% for insc in inscriptions %}
+                            <div style="padding: 0.75rem; background: #f8fafc; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                                <div style="font-weight: 700; font-size: 0.92rem;">{{ insc.formation.titre }}</div>
+                                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem;">
+                                    Inscrit le {{ insc.dateInscription|date:"d/m/Y" }} &bull; Statut : {{ insc.statut }}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p style="font-size: 0.9rem; color: var(--text-muted);">Aucune formation en cours pour le moment.</p>
+                    {% endif %}
+                </div>
+
+                <div class="card" style="background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);">
+                    <h3 class="card-title" style="font-size: 1.15rem; margin-bottom: 0.5rem;">
+                        <i class="fa-solid fa-lightbulb" style="color: #f59e0b;"></i> Boostez votre profil
+                    </h3>
+                    <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1rem;">
+                        Complétez votre bio et mettez à jour vos compétences pour attirer les recruteurs.
+                    </p>
+                    <a href="{% url 'profile_edit' %}" class="btn btn-secondary btn-sm">
+                        <i class="fa-solid fa-pen-to-square"></i> Compléter mon profil
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    <!-- ========================================== -->
+    <!-- 2. VUE ENTREPRISE                          -->
+    <!-- ========================================== -->
+    {% elif user.is_entreprise %}
+        <!-- KPIs Entreprise -->
+        <div class="dashboard-kpis">
+            <div class="kpi-card">
+                <div class="kpi-icon" style="background: #fef3c7; color: #b45309;">
+                    <i class="fa-solid fa-briefcase"></i>
+                </div>
+                <div>
+                    <div class="kpi-value">{{ mes_offres_count }}</div>
+                    <div class="kpi-label">Offres publiées</div>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon" style="background: #dbeafe; color: #1d4ed8;">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+                <div>
+                    <div class="kpi-value">{{ candidatures_count }}</div>
+                    <div class="kpi-label">Candidatures reçues</div>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon" style="background: #d1fae5; color: #047857;">
+                    <i class="fa-solid fa-building-circle-check"></i>
+                </div>
+                <div>
+                    <div class="kpi-value">{{ entreprise_obj.secteur|truncatewords:2 }}</div>
+                    <div class="kpi-label">Secteur d'activité</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <!-- Candidatures Reçues -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title" style="font-size: 1.25rem;"><i class="fa-solid fa-inbox" style="color: var(--primary);"></i> Candidatures Reçues</h2>
+                    <p class="card-subtitle">Profils ayant postulé à vos offres récentes</p>
+                </div>
+
+                {% if candidatures_recues %}
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Candidat</th>
+                                <th>Offre</th>
+                                <th>Date</th>
+                                <th>Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for c in candidatures_recues %}
+                            <tr>
+                                <td style="font-weight: 700;">{{ c.candidat.prenom }} {{ c.candidat.nom }}</td>
+                                <td>{{ c.offre.titre }}</td>
+                                <td>{{ c.dateCandidature|date:"d/m/Y" }}</td>
+                                <td>
+                                    <span class="badge 
+                                        {% if c.statut == 'ACCEPTEE' %}badge-status-accepted
+                                        {% elif c.statut == 'REFUSEE' %}badge-status-refused
+                                        {% else %}badge-status-waiting{% endif %}">
+                                        {{ c.get_statut_display }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <i class="fa-solid fa-envelope-open-text empty-state-icon"></i>
+                    <p class="empty-state-text">Aucune candidature reçue pour le moment.</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Mes Offres Publiées -->
+            <div class="card">
+                <h3 class="card-title" style="font-size: 1.15rem; margin-bottom: 1rem;">
+                    <i class="fa-solid fa-bullhorn" style="color: #f59e0b;"></i> Mes Dernières Offres
+                </h3>
+                {% if mes_offres %}
+                    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                        {% for o in mes_offres %}
+                        <div style="padding: 0.85rem; background: #f8fafc; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                            <div style="font-weight: 700; font-size: 0.95rem;">{{ o.titre }}</div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem;">
+                                {{ o.typeContrat }} &bull; {{ o.localisation }} &bull; Statut : {{ o.statut }}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p style="font-size: 0.9rem; color: var(--text-muted);">Aucune offre d'emploi active actuellement.</p>
+                {% endif %}
+            </div>
+        </div>
+
+    <!-- ========================================== -->
+    <!-- 3. VUE FORMATEUR                           -->
+    <!-- ========================================== -->
+    {% elif user.is_formateur %}
+        <!-- KPIs Formateur -->
+        <div class="dashboard-kpis">
+            <div class="kpi-card">
+                <div class="kpi-icon" style="background: #d1fae5; color: #047857;">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+                <div>
+                    <div class="kpi-value">{{ mes_formations_count }}</div>
+                    <div class="kpi-label">Formations créées</div>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon" style="background: #dbeafe; color: #1d4ed8;">
+                    <i class="fa-solid fa-user-group"></i>
+                </div>
+                <div>
+                    <div class="kpi-value">{{ total_apprenants }}</div>
+                    <div class="kpi-label">Inscriptions enregistrées</div>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon" style="background: #ede9fe; color: #6d28d9;">
+                    <i class="fa-solid fa-certificate"></i>
+                </div>
+                <div>
+                    <div class="kpi-value">{{ total_certifs }}</div>
+                    <div class="kpi-label">Certifications attribuées</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <!-- Formations Animées -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title" style="font-size: 1.25rem;"><i class="fa-solid fa-chalkboard-user" style="color: var(--primary);"></i> Mes Sessions de Formation</h2>
+                    <p class="card-subtitle">Gestion de vos programmes pédagogiques</p>
+                </div>
+
+                {% if mes_formations %}
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Programme</th>
+                                <th>Domaine</th>
+                                <th>Durée</th>
+                                <th>Période</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for f in mes_formations %}
+                            <tr>
+                                <td style="font-weight: 700;">{{ f.titre }}</td>
+                                <td>{{ f.domaine }}</td>
+                                <td>{{ f.duree }} h</td>
+                                <td>Du {{ f.dateDebut|date:"d/m" }} au {{ f.dateFin|date:"d/m/Y" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <i class="fa-solid fa-book empty-state-icon"></i>
+                    <p class="empty-state-text">Vous n'avez pas encore configuré de formation.</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Inscriptions Récentes -->
+            <div class="card">
+                <h3 class="card-title" style="font-size: 1.15rem; margin-bottom: 1rem;">
+                    <i class="fa-solid fa-user-plus" style="color: var(--accent-emerald);"></i> Derniers Apprenants
+                </h3>
+                {% if inscriptions_recues %}
+                    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                        {% for i in inscriptions_recues %}
+                        <div style="padding: 0.85rem; background: #f8fafc; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                            <div style="font-weight: 700; font-size: 0.95rem;">{{ i.candidat.prenom }} {{ i.candidat.nom }}</div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem;">
+                                {{ i.formation.titre }} &bull; {{ i.dateInscription|date:"d/m/Y" }}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p style="font-size: 0.9rem; color: var(--text-muted);">Aucune nouvelle inscription.</p>
+                {% endif %}
+            </div>
+        </div>
+
+    <!-- ========================================== -->
+    <!-- 4. VUE ADMINISTRATEUR / STAFF              -->
+    <!-- ========================================== -->
+    {% else %}
+        <div class="dashboard-kpis">
+            <div class="kpi-card">
+                <div class="kpi-icon" style="background: #f3e8ff; color: #7c3aed;">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+                <div>
+                    <div class="kpi-value">{{ total_users }}</div>
+                    <div class="kpi-label">Utilisateurs au total</div>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon" style="background: #dbeafe; color: #1d4ed8;">
+                    <i class="fa-solid fa-user-graduate"></i>
+                </div>
+                <div>
+                    <div class="kpi-value">{{ total_candidats }}</div>
+                    <div class="kpi-label">Candidats</div>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon" style="background: #fef3c7; color: #b45309;">
+                    <i class="fa-solid fa-building"></i>
+                </div>
+                <div>
+                    <div class="kpi-value">{{ total_entreprises }}</div>
+                    <div class="kpi-label">Entreprises</div>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon" style="background: #d1fae5; color: #047857;">
+                    <i class="fa-solid fa-chalkboard-user"></i>
+                </div>
+                <div>
+                    <div class="kpi-value">{{ total_formateurs }}</div>
+                    <div class="kpi-label">Formateurs</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="margin-top: 1.5rem;">
+            <div class="card-header">
+                <h2 class="card-title"><i class="fa-solid fa-shield-halved" style="color: var(--primary);"></i> Panneau de Contrôle Administrateur</h2>
+                <p class="card-subtitle">Gestion globale de la plateforme HirePoint</p>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                <a href="{% url 'admin:index' %}" class="btn btn-primary btn-lg" style="justify-content: flex-start;" target="_blank">
+                    <i class="fa-solid fa-gear"></i> Administration Django
+                </a>
+                <a href="{% url 'profile_edit' %}" class="btn btn-secondary btn-lg" style="justify-content: flex-start;">
+                    <i class="fa-solid fa-user-pen"></i> Modifier mes informations
+                </a>
+                <a href="{% url 'password_change' %}" class="btn btn-secondary btn-lg" style="justify-content: flex-start;">
+                    <i class="fa-solid fa-key"></i> Changer mon mot de passe
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

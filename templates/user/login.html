@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Connexion - HirePoint{% endblock %}
+{% block meta_description %}Connectez-vous à votre compte HirePoint pour accéder à votre tableau de bord, candidatures, offres ou formations.{% endblock %}
+
+{% block content %}
+<div class="container-narrow" style="padding-top: 1.5rem; padding-bottom: 2rem;">
+    <div class="auth-box" id="login-auth-box">
+        <div class="auth-header">
+            <span class="auth-badge">
+                <i class="fa-solid fa-lock"></i> Espace Sécurisé
+            </span>
+            <h1 class="auth-title">Bon retour parmi nous</h1>
+            <p class="auth-subtitle">Saisissez vos identifiants pour accéder à votre espace</p>
+        </div>
+
+        <div class="auth-body">
+            <form method="post" action="{% url 'login' %}{% if next %}?next={{ next }}{% endif %}" id="login-form">
+                {% csrf_token %}
+
+                <!-- Identifiant (Username ou Email) -->
+                <div class="form-group">
+                    <label class="form-label" for="login-identifier">
+                        <i class="fa-regular fa-user" style="color: var(--primary);"></i> Nom d'utilisateur ou Adresse Email
+                    </label>
+                    <div class="input-with-icon">
+                        <i class="fa-regular fa-envelope input-icon"></i>
+                        {{ form.username_or_email }}
+                    </div>
+                    {% if form.username_or_email.errors %}
+                        <div class="form-error">
+                            <i class="fa-solid fa-circle-exclamation"></i>
+                            {{ form.username_or_email.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Mot de passe -->
+                <div class="form-group">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.45rem;">
+                        <label class="form-label" for="login-password" style="margin-bottom: 0;">
+                            <i class="fa-solid fa-key" style="color: var(--primary);"></i> Mot de passe
+                        </label>
+                        <a href="{% url 'password_reset' %}" style="font-size: 0.82rem; font-weight: 600;" id="forgot-password-link">
+                            Mot de passe oublié ?
+                        </a>
+                    </div>
+                    <div class="input-with-icon password-toggle-wrapper">
+                        <i class="fa-solid fa-lock input-icon"></i>
+                        {{ form.password }}
+                        <button type="button" class="password-toggle-btn" data-target="login-password" aria-label="Afficher ou masquer le mot de passe">
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
+                    {% if form.password.errors %}
+                        <div class="form-error">
+                            <i class="fa-solid fa-circle-exclamation"></i>
+                            {{ form.password.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Remember me -->
+                <div class="form-group" style="margin-bottom: 1.75rem;">
+                    <div class="form-check">
+                        {{ form.remember_me }}
+                        <label class="form-check-label" for="remember-me-checkbox">
+                            Rester connecté sur cet appareil
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Bouton de connexion -->
+                <button type="submit" class="btn btn-primary btn-block btn-lg" id="login-submit-btn">
+                    <i class="fa-solid fa-arrow-right-to-bracket"></i> Se connecter
+                </button>
+            </form>
+
+            <!-- Accès Rapide Démo -->
+            <div class="demo-accounts-card" id="demo-accounts-panel">
+                <div class="demo-title">
+                    <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--primary);"></i>
+                    Comptes de test rapide (1-clic)
+                </div>
+                <div class="demo-chips">
+                    <button type="button" class="demo-chip" onclick="fillDemoAccount('tbernard', 'password123')" id="demo-candidat-btn" title="Tester en tant que Candidat">
+                        <i class="fa-solid fa-user-graduate" style="color: #2563eb;"></i> Candidat
+                    </button>
+                    <button type="button" class="demo-chip" onclick="fillDemoAccount('technova', 'password123')" id="demo-entreprise-btn" title="Tester en tant qu'Entreprise">
+                        <i class="fa-solid fa-building" style="color: #d97706;"></i> Entreprise
+                    </button>
+                    <button type="button" class="demo-chip" onclick="fillDemoAccount('mdupont', 'password123')" id="demo-formateur-btn" title="Tester en tant que Formateur">
+                        <i class="fa-solid fa-chalkboard-user" style="color: #059669;"></i> Formateur
+                    </button>
+                    <button type="button" class="demo-chip" onclick="fillDemoAccount('admin', 'admin123')" id="demo-admin-btn" title="Tester en tant qu'Administrateur">
+                        <i class="fa-solid fa-shield-halved" style="color: #7c3aed;"></i> Admin
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="auth-footer">
+            Pas encore de compte ? 
+            <a href="{% url 'register' %}" style="font-weight: 700;" id="link-to-register">
+                Inscrivez-vous gratuitement <i class="fa-solid fa-arrow-right" style="font-size: 0.8rem;"></i>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

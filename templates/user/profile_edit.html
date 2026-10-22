@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Modifier mon profil - HirePoint{% endblock %}
+
+{% block content %}
+<div class="container-narrow" style="padding-top: 1rem; padding-bottom: 2rem;">
+    <div class="card" id="profile-edit-card">
+        <div class="card-header" style="border-bottom: 1px solid var(--border-color); padding-bottom: 1.25rem;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div>
+                    <h1 class="card-title"><i class="fa-solid fa-user-pen" style="color: var(--primary);"></i> Modifier mes informations</h1>
+                    <p class="card-subtitle">Mettez à jour vos coordonnées et détails de profil</p>
+                </div>
+                <span class="badge 
+                    {% if user.is_admin %}badge-admin
+                    {% elif user.is_entreprise %}badge-entreprise
+                    {% elif user.is_formateur %}badge-formateur
+                    {% else %}badge-candidat{% endif %}">
+                    {{ user.get_role_display }}
+                </span>
+            </div>
+        </div>
+
+        <form method="post" action="{% url 'profile_edit' %}" style="margin-top: 1.5rem;" id="profile-edit-form">
+            {% csrf_token %}
+
+            {% for field in form %}
+                <div class="form-group">
+                    <label class="form-label" for="{{ field.id_for_label }}">
+                        {{ field.label }} {% if field.field.required %}*{% endif %}
+                    </label>
+                    {{ field }}
+                    {% if field.help_text %}
+                        <div class="form-help">{{ field.help_text }}</div>
+                    {% endif %}
+                    {% if field.errors %}
+                        <div class="form-error">
+                            <i class="fa-solid fa-circle-exclamation"></i> {{ field.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                <button type="submit" class="btn btn-primary btn-lg" style="flex: 1;" id="save-profile-btn">
+                    <i class="fa-solid fa-floppy-disk"></i> Enregistrer les modifications
+                </button>
+                <a href="{% url 'profile' %}" class="btn btn-secondary btn-lg" id="cancel-profile-btn">
+                    Annuler
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

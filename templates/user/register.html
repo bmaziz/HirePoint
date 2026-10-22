@@ -1,0 +1,280 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Inscription - HirePoint{% endblock %}
+{% block meta_description %}Créez votre compte sur HirePoint en tant que Candidat, Entreprise ou Formateur certifié.{% endblock %}
+
+{% block content %}
+<div class="container-medium" style="padding-top: 1rem; padding-bottom: 2rem;">
+    <div class="auth-box" id="register-auth-box">
+        <div class="auth-header">
+            <span class="auth-badge">
+                <i class="fa-solid fa-sparkles"></i> Rejoindre la communauté
+            </span>
+            <h1 class="auth-title">Créer votre compte HirePoint</h1>
+            <p class="auth-subtitle">Sélectionnez votre profil pour accéder à un espace sur-mesure</p>
+        </div>
+
+        <div class="auth-body">
+            <!-- Sélecteur de rôle -->
+            <div class="role-tabs" id="registration-role-tabs">
+                <button type="button" class="role-tab-btn {% if active_tab == 'candidat' %}active{% endif %}" data-role="candidat" id="tab-btn-candidat">
+                    <i class="fa-solid fa-user-graduate"></i>
+                    <span>Candidat</span>
+                </button>
+                <button type="button" class="role-tab-btn {% if active_tab == 'entreprise' %}active{% endif %}" data-role="entreprise" id="tab-btn-entreprise">
+                    <i class="fa-solid fa-building"></i>
+                    <span>Entreprise</span>
+                </button>
+                <button type="button" class="role-tab-btn {% if active_tab == 'formateur' %}active{% endif %}" data-role="formateur" id="tab-btn-formateur">
+                    <i class="fa-solid fa-chalkboard-user"></i>
+                    <span>Formateur</span>
+                </button>
+            </div>
+
+            <!-- PANEL 1: CANDIDAT -->
+            <div class="role-tab-panel {% if active_tab == 'candidat' %}active{% endif %}" id="panel-candidat">
+                <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: var(--radius-md); padding: 0.85rem 1rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+                    <i class="fa-solid fa-circle-info" style="color: #2563eb; font-size: 1.1rem;"></i>
+                    <span style="font-size: 0.88rem; color: #1e40af;">Créez votre profil candidat pour postuler en 1 clic aux offres et suivre des formations certifiantes.</span>
+                </div>
+
+                <form method="post" action="{% url 'register' %}" id="form-register-candidat">
+                    {% csrf_token %}
+                    <input type="hidden" name="target_role" value="candidat">
+
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label class="form-label" for="id_candidat-prenom">Prénom *</label>
+                            {{ candidat_form.prenom }}
+                            {% if candidat_form.prenom.errors %}<div class="form-error"><i class="fa-solid fa-circle-exclamation"></i>{{ candidat_form.prenom.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="id_candidat-nom">Nom *</label>
+                            {{ candidat_form.nom }}
+                            {% if candidat_form.nom.errors %}<div class="form-error"><i class="fa-solid fa-circle-exclamation"></i>{{ candidat_form.nom.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label class="form-label" for="id_candidat-username">Nom d'utilisateur *</label>
+                            {{ candidat_form.username }}
+                            {% if candidat_form.username.errors %}<div class="form-error"><i class="fa-solid fa-circle-exclamation"></i>{{ candidat_form.username.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="id_candidat-email">Adresse Email *</label>
+                            {{ candidat_form.email }}
+                            {% if candidat_form.email.errors %}<div class="form-error"><i class="fa-solid fa-circle-exclamation"></i>{{ candidat_form.email.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label class="form-label" for="id_candidat-telephone">Téléphone *</label>
+                            {{ candidat_form.telephone }}
+                            {% if candidat_form.telephone.errors %}<div class="form-error"><i class="fa-solid fa-circle-exclamation"></i>{{ candidat_form.telephone.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="id_candidat-adresse">Adresse / Ville *</label>
+                            {{ candidat_form.adresse }}
+                            {% if candidat_form.adresse.errors %}<div class="form-error"><i class="fa-solid fa-circle-exclamation"></i>{{ candidat_form.adresse.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="id_candidat-bio">Présentation / Bio (optionnel)</label>
+                        {{ candidat_form.bio }}
+                        {% if candidat_form.bio.errors %}<div class="form-error"><i class="fa-solid fa-circle-exclamation"></i>{{ candidat_form.bio.errors.0 }}</div>{% endif %}
+                    </div>
+
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label class="form-label" for="id_candidat-password">Mot de passe *</label>
+                            <div class="password-toggle-wrapper">
+                                {{ candidat_form.password }}
+                                <button type="button" class="password-toggle-btn" data-target="id_candidat-password" aria-label="Afficher le mot de passe"><i class="fa-solid fa-eye"></i></button>
+                            </div>
+                            {% if candidat_form.password.errors %}<div class="form-error"><i class="fa-solid fa-circle-exclamation"></i>{{ candidat_form.password.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="id_candidat-password_confirm">Confirmer mot de passe *</label>
+                            <div class="password-toggle-wrapper">
+                                {{ candidat_form.password_confirm }}
+                                <button type="button" class="password-toggle-btn" data-target="id_candidat-password_confirm" aria-label="Afficher le mot de passe"><i class="fa-solid fa-eye"></i></button>
+                            </div>
+                            {% if candidat_form.password_confirm.errors %}<div class="form-error"><i class="fa-solid fa-circle-exclamation"></i>{{ candidat_form.password_confirm.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top: 1rem;" id="submit-candidat-register">
+                        <i class="fa-solid fa-user-plus"></i> Finaliser mon inscription Candidat
+                    </button>
+                </form>
+            </div>
+
+            <!-- PANEL 2: ENTREPRISE -->
+            <div class="role-tab-panel {% if active_tab == 'entreprise' %}active{% endif %}" id="panel-entreprise">
+                <div style="background: #fffbeb; border: 1px solid #fef3c7; border-radius: var(--radius-md); padding: 0.85rem 1rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+                    <i class="fa-solid fa-building" style="color: #d97706; font-size: 1.1rem;"></i>
+                    <span style="font-size: 0.88rem; color: #92400e;">Créez un compte entreprise pour publier des annonces d'emploi et gérer vos recrutements.</span>
+                </div>
+
+                <form method="post" action="{% url 'register' %}" id="form-register-entreprise">
+                    {% csrf_token %}
+                    <input type="hidden" name="target_role" value="entreprise">
+
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label class="form-label" for="id_entreprise-nomEntreprise">Raison Sociale / Nom Entreprise *</label>
+                            {{ entreprise_form.nomEntreprise }}
+                            {% if entreprise_form.nomEntreprise.errors %}<div class="form-error"><i class="fa-solid fa-circle-exclamation"></i>{{ entreprise_form.nomEntreprise.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="id_entreprise-secteur">Secteur d'activité *</label>
+                            {{ entreprise_form.secteur }}
+                            {% if entreprise_form.secteur.errors %}<div class="form-error"><i class="fa-solid fa-circle-exclamation"></i>{{ entreprise_form.secteur.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label class="form-label" for="id_entreprise-username">Identifiant de connexion *</label>
+                            {{ entreprise_form.username }}
+                            {% if entreprise_form.username.errors %}<div class="form-error"><i class="fa-solid fa-circle-exclamation"></i>{{ entreprise_form.username.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="id_entreprise-email">Email professionnel *</label>
+                            {{ entreprise_form.email }}
+                            {% if entreprise_form.email.errors %}<div class="form-error"><i class="fa-solid fa-circle-exclamation"></i>{{ entreprise_form.email.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label class="form-label" for="id_entreprise-adresse">Adresse du siège social *</label>
+                            {{ entreprise_form.adresse }}
+                            {% if entreprise_form.adresse.errors %}<div class="form-error"><i class="fa-solid fa-circle-exclamation"></i>{{ entreprise_form.adresse.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="id_entreprise-siteWeb">Site Internet (optionnel)</label>
+                            {{ entreprise_form.siteWeb }}
+                            {% if entreprise_form.siteWeb.errors %}<div class="form-error"><i class="fa-solid fa-circle-exclamation"></i>{{ entreprise_form.siteWeb.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="id_entreprise-description">Description de l'entreprise</label>
+                        {{ entreprise_form.description }}
+                        {% if entreprise_form.description.errors %}<div class="form-error"><i class="fa-solid fa-circle-exclamation"></i>{{ entreprise_form.description.errors.0 }}</div>{% endif %}
+                    </div>
+
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label class="form-label" for="id_entreprise-password">Mot de passe *</label>
+                            <div class="password-toggle-wrapper">
+                                {{ entreprise_form.password }}
+                                <button type="button" class="password-toggle-btn" data-target="id_entreprise-password" aria-label="Afficher le mot de passe"><i class="fa-solid fa-eye"></i></button>
+                            </div>
+                            {% if entreprise_form.password.errors %}<div class="form-error"><i class="fa-solid fa-circle-exclamation"></i>{{ entreprise_form.password.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="id_entreprise-password_confirm">Confirmer mot de passe *</label>
+                            <div class="password-toggle-wrapper">
+                                {{ entreprise_form.password_confirm }}
+                                <button type="button" class="password-toggle-btn" data-target="id_entreprise-password_confirm" aria-label="Afficher le mot de passe"><i class="fa-solid fa-eye"></i></button>
+                            </div>
+                            {% if entreprise_form.password_confirm.errors %}<div class="form-error"><i class="fa-solid fa-circle-exclamation"></i>{{ entreprise_form.password_confirm.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top: 1rem;" id="submit-entreprise-register">
+                        <i class="fa-solid fa-building-circle-check"></i> Créer mon compte Entreprise
+                    </button>
+                </form>
+            </div>
+
+            <!-- PANEL 3: FORMATEUR -->
+            <div class="role-tab-panel {% if active_tab == 'formateur' %}active{% endif %}" id="panel-formateur">
+                <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: var(--radius-md); padding: 0.85rem 1rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+                    <i class="fa-solid fa-chalkboard-user" style="color: #16a34a; font-size: 1.1rem;"></i>
+                    <span style="font-size: 0.88rem; color: #166534;">Partagez votre expertise, dispensez des formations et délivrez des certifications.</span>
+                </div>
+
+                <form method="post" action="{% url 'register' %}" id="form-register-formateur">
+                    {% csrf_token %}
+                    <input type="hidden" name="target_role" value="formateur">
+
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label class="form-label" for="id_formateur-prenom">Prénom *</label>
+                            {{ formateur_form.prenom }}
+                            {% if formateur_form.prenom.errors %}<div class="form-error"><i class="fa-solid fa-circle-exclamation"></i>{{ formateur_form.prenom.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="id_formateur-nom">Nom *</label>
+                            {{ formateur_form.nom }}
+                            {% if formateur_form.nom.errors %}<div class="form-error"><i class="fa-solid fa-circle-exclamation"></i>{{ formateur_form.nom.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label class="form-label" for="id_formateur-username">Nom d'utilisateur *</label>
+                            {{ formateur_form.username }}
+                            {% if formateur_form.username.errors %}<div class="form-error"><i class="fa-solid fa-circle-exclamation"></i>{{ formateur_form.username.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="id_formateur-email">Adresse Email *</label>
+                            {{ formateur_form.email }}
+                            {% if formateur_form.email.errors %}<div class="form-error"><i class="fa-solid fa-circle-exclamation"></i>{{ formateur_form.email.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="id_formateur-specialite">Spécialité / Domaine d'expertise *</label>
+                        {{ formateur_form.specialite }}
+                        {% if formateur_form.specialite.errors %}<div class="form-error"><i class="fa-solid fa-circle-exclamation"></i>{{ formateur_form.specialite.errors.0 }}</div>{% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="id_formateur-bio">Biographie / Expérience pédagogique (optionnel)</label>
+                        {{ formateur_form.bio }}
+                        {% if formateur_form.bio.errors %}<div class="form-error"><i class="fa-solid fa-circle-exclamation"></i>{{ formateur_form.bio.errors.0 }}</div>{% endif %}
+                    </div>
+
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label class="form-label" for="id_formateur-password">Mot de passe *</label>
+                            <div class="password-toggle-wrapper">
+                                {{ formateur_form.password }}
+                                <button type="button" class="password-toggle-btn" data-target="id_formateur-password" aria-label="Afficher le mot de passe"><i class="fa-solid fa-eye"></i></button>
+                            </div>
+                            {% if formateur_form.password.errors %}<div class="form-error"><i class="fa-solid fa-circle-exclamation"></i>{{ formateur_form.password.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="id_formateur-password_confirm">Confirmer mot de passe *</label>
+                            <div class="password-toggle-wrapper">
+                                {{ formateur_form.password_confirm }}
+                                <button type="button" class="password-toggle-btn" data-target="id_formateur-password_confirm" aria-label="Afficher le mot de passe"><i class="fa-solid fa-eye"></i></button>
+                            </div>
+                            {% if formateur_form.password_confirm.errors %}<div class="form-error"><i class="fa-solid fa-circle-exclamation"></i>{{ formateur_form.password_confirm.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top: 1rem;" id="submit-formateur-register">
+                        <i class="fa-solid fa-chalkboard-user"></i> Devenir Formateur sur HirePoint
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="auth-footer">
+            Vous avez déjà un compte ? 
+            <a href="{% url 'login' %}" style="font-weight: 700;" id="link-to-login">
+                Connectez-vous <i class="fa-solid fa-arrow-right" style="font-size: 0.8rem;"></i>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mon Profil - HirePoint{% endblock %}
+
+{% block content %}
+<div class="container-medium" style="padding-top: 1rem; padding-bottom: 2rem;">
+    <div class="card" style="padding: 0; overflow: hidden; margin-bottom: 2rem;">
+        <div class="profile-cover"></div>
+        <div class="profile-card-header">
+            <div style="display: flex; align-items: flex-end; gap: 1.25rem;">
+                <div class="profile-avatar-large">
+                    {{ user.username|slice:":1"|upper }}
+                </div>
+                <div>
+                    <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                        <h1 style="font-size: 1.75rem; font-weight: 800; color: var(--text-main);">{{ user.display_name }}</h1>
+                        <span class="badge 
+                            {% if user.is_admin %}badge-admin
+                            {% elif user.is_entreprise %}badge-entreprise
+                            {% elif user.is_formateur %}badge-formateur
+                            {% else %}badge-candidat{% endif %}">
+                            {{ user.get_role_display }}
+                        </span>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.25rem;">
+                        <i class="fa-regular fa-envelope"></i> {{ user.email }} &bull; Inscrit le {{ user.dateInscription|date:"d F Y" }}
+                    </p>
+                </div>
+            </div>
+            <div style="display: flex; gap: 0.75rem;">
+                <a href="{% url 'profile_edit' %}" class="btn btn-primary" id="profile-edit-btn">
+                    <i class="fa-solid fa-pen-to-square"></i> Modifier profil
+                </a>
+                <a href="{% url 'password_change' %}" class="btn btn-secondary" id="profile-password-btn">
+                    <i class="fa-solid fa-key"></i> Mot de passe
+                </a>
+            </div>
+        </div>
+
+        <div style="padding: 1.5rem 2rem 2.5rem 2rem; border-top: 1px solid var(--border-color);">
+            <h2 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 1rem; color: var(--text-main);">
+                <i class="fa-solid fa-id-card" style="color: var(--primary);"></i> Informations du compte
+            </h2>
+
+            <div class="profile-details-grid">
+                <div class="profile-detail-item">
+                    <div class="profile-detail-label">Nom d'utilisateur</div>
+                    <div class="profile-detail-value">{{ user.username }}</div>
+                </div>
+
+                <div class="profile-detail-item">
+                    <div class="profile-detail-label">Adresse Email</div>
+                    <div class="profile-detail-value">{{ user.email|default:"Non renseignée" }}</div>
+                </div>
+
+                <!-- Détails Candidat -->
+                {% if user.is_candidat and profile_obj %}
+                    <div class="profile-detail-item">
+                        <div class="profile-detail-label">Nom complet</div>
+                        <div class="profile-detail-value">{{ profile_obj.prenom }} {{ profile_obj.nom }}</div>
+                    </div>
+                    <div class="profile-detail-item">
+                        <div class="profile-detail-label">Téléphone</div>
+                        <div class="profile-detail-value">{{ profile_obj.telephone|default:"Non renseigné" }}</div>
+                    </div>
+                    <div class="profile-detail-item" style="grid-column: 1 / -1;">
+                        <div class="profile-detail-label">Adresse / Localisation</div>
+                        <div class="profile-detail-value">{{ profile_obj.adresse|default:"Non renseignée" }}</div>
+                    </div>
+                    {% if profile_obj.bio %}
+                    <div class="profile-detail-item" style="grid-column: 1 / -1;">
+                        <div class="profile-detail-label">Présentation / Bio</div>
+                        <div class="profile-detail-value" style="font-weight: 400; line-height: 1.6;">{{ profile_obj.bio }}</div>
+                    </div>
+                    {% endif %}
+                    {% if profile_obj.competences.all %}
+                    <div class="profile-detail-item" style="grid-column: 1 / -1;">
+                        <div class="profile-detail-label">Compétences validées</div>
+                        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem;">
+                            {% for c in profile_obj.competences.all %}
+                            <span class="badge" style="background: #eef2ff; color: var(--primary); font-size: 0.8rem; text-transform: none;">
+                                <i class="fa-solid fa-check"></i> {{ c.nom }}
+                            </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                <!-- Détails Entreprise -->
+                {% elif user.is_entreprise and profile_obj %}
+                    <div class="profile-detail-item">
+                        <div class="profile-detail-label">Raison Sociale</div>
+                        <div class="profile-detail-value">{{ profile_obj.nomEntreprise }}</div>
+                    </div>
+                    <div class="profile-detail-item">
+                        <div class="profile-detail-label">Secteur d'activité</div>
+                        <div class="profile-detail-value">{{ profile_obj.secteur }}</div>
+                    </div>
+                    <div class="profile-detail-item">
+                        <div class="profile-detail-label">Adresse du siège</div>
+                        <div class="profile-detail-value">{{ profile_obj.adresse }}</div>
+                    </div>
+                    <div class="profile-detail-item">
+                        <div class="profile-detail-label">Site Internet</div>
+                        <div class="profile-detail-value">
+                            {% if profile_obj.siteWeb %}
+                            <a href="{{ profile_obj.siteWeb }}" target="_blank" rel="noopener noreferrer">
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i> {{ profile_obj.siteWeb }}
+                            </a>
+                            {% else %}Non renseigné{% endif %}
+                        </div>
+                    </div>
+                    {% if profile_obj.description %}
+                    <div class="profile-detail-item" style="grid-column: 1 / -1;">
+                        <div class="profile-detail-label">Description de l'entreprise</div>
+                        <div class="profile-detail-value" style="font-weight: 400; line-height: 1.6;">{{ profile_obj.description }}</div>
+                    </div>
+                    {% endif %}
+
+                <!-- Détails Formateur -->
+                {% elif user.is_formateur and profile_obj %}
+                    <div class="profile-detail-item">
+                        <div class="profile-detail-label">Formateur</div>
+                        <div class="profile-detail-value">{{ profile_obj.prenom }} {{ profile_obj.nom }}</div>
+                    </div>
+                    <div class="profile-detail-item">
+                        <div class="profile-detail-label">Spécialité</div>
+                        <div class="profile-detail-value">{{ profile_obj.specialite }}</div>
+                    </div>
+                    {% if profile_obj.bio %}
+                    <div class="profile-detail-item" style="grid-column: 1 / -1;">
+                        <div class="profile-detail-label">Biographie / Parcours</div>
+                        <div class="profile-detail-value" style="font-weight: 400; line-height: 1.6;">{{ profile_obj.bio }}</div>
+                    </div>
+                    {% endif %}
+
+                <!-- Détails Administrateur -->
+                {% else %}
+                    <div class="profile-detail-item">
+                        <div class="profile-detail-label">Prénom</div>
+                        <div class="profile-detail-value">{{ user.first_name|default:"Non renseigné" }}</div>
+                    </div>
+                    <div class="profile-detail-item">
+                        <div class="profile-detail-label">Nom</div>
+                        <div class="profile-detail-value">{{ user.last_name|default:"Non renseigné" }}</div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
