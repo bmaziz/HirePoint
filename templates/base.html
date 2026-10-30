@@ -1,4 +1,4 @@
-{% load static %}
+﻿{% load static %}
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -41,7 +41,12 @@
             <ul class="nav-menu" id="nav-menu">
                 <li><a href="{% url 'home' %}" class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}"><i class="fa-solid fa-house"></i> Accueil</a></li>
                 {% if user.is_authenticated %}
-                <li><a href="{% url 'dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"><i class="fa-solid fa-chart-pie"></i> Tableau de bord</a></li>
+                <li><a href="{% url 'dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' or request.resolver_match.app_name == 'formateur' %}active{% endif %}"><i class="fa-solid fa-chart-pie"></i> Tableau de bord</a></li>
+                {% if user.is_formateur %}
+                <li><a href="{% url 'formateur:formation_list' %}" class="nav-link {% if 'formation' in request.resolver_match.url_name %}active{% endif %}"><i class="fa-solid fa-graduation-cap"></i> Formations</a></li>
+                <li><a href="{% url 'formateur:participant_list' %}" class="nav-link {% if 'participant' in request.resolver_match.url_name %}active{% endif %}"><i class="fa-solid fa-user-group"></i> Apprenants</a></li>
+                <li><a href="{% url 'formateur:certification_list' %}" class="nav-link {% if 'certification' in request.resolver_match.url_name %}active{% endif %}"><i class="fa-solid fa-award"></i> Certifications</a></li>
+                {% endif %}
                 {% endif %}
             </ul>
 
@@ -67,6 +72,33 @@
 
                         <!-- Dropdown panel -->
                         <div class="dropdown-menu" id="user-dropdown-panel">
+                            {% if user.is_formateur %}
+                            <a href="{% url 'formateur:dashboard' %}" class="dropdown-item" id="nav-dropdown-dashboard">
+                                <i class="fa-solid fa-gauge-high"></i> Tableau de bord
+                            </a>
+                            <a href="{% url 'formateur:formation_list' %}" class="dropdown-item">
+                                <i class="fa-solid fa-chalkboard-user"></i> Mes Formations
+                            </a>
+                            <a href="{% url 'formateur:participant_list' %}" class="dropdown-item">
+                                <i class="fa-solid fa-users"></i> Mes Apprenants
+                            </a>
+                            <a href="{% url 'formateur:certification_list' %}" class="dropdown-item">
+                                <i class="fa-solid fa-award"></i> Certifications
+                            </a>
+                            <a href="{% url 'formateur:notification_list' %}" class="dropdown-item">
+                                <i class="fa-solid fa-bell"></i> Notifications
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a href="{% url 'formateur:profile' %}" class="dropdown-item" id="nav-dropdown-profile">
+                                <i class="fa-solid fa-user"></i> Mon Profil
+                            </a>
+                            <a href="{% url 'formateur:profile_edit' %}" class="dropdown-item" id="nav-dropdown-profile-edit">
+                                <i class="fa-solid fa-pen-to-square"></i> Modifier profil
+                            </a>
+                            <a href="{% url 'password_change' %}" class="dropdown-item" id="nav-dropdown-password-change">
+                                <i class="fa-solid fa-key"></i> Mot de passe
+                            </a>
+                            {% else %}
                             <a href="{% url 'dashboard' %}" class="dropdown-item" id="nav-dropdown-dashboard">
                                 <i class="fa-solid fa-gauge-high"></i> Tableau de bord
                             </a>
@@ -79,6 +111,7 @@
                             <a href="{% url 'password_change' %}" class="dropdown-item" id="nav-dropdown-password-change">
                                 <i class="fa-solid fa-key"></i> Mot de passe
                             </a>
+                            {% endif %}
                             {% if user.is_staff or user.is_superuser %}
                             <div class="dropdown-divider"></div>
                             <a href="{% url 'admin:index' %}" class="dropdown-item" id="nav-dropdown-admin" target="_blank">

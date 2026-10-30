@@ -1,0 +1,146 @@
+﻿{% extends 'formateur/base_formateur.html' %}
+{% load static %}
+
+{% block title %}Suivi des Apprenants - HirePoint Formateur{% endblock %}
+
+{% block formateur_content %}
+<div class="card">
+    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <h1 class="card-title" style="font-size: 1.45rem;">
+                <i class="fa-solid fa-users-viewfinder" style="color: var(--primary);"></i> Suivi des Apprenants
+            </h1>
+            <p class="card-subtitle">Visualisez les candidats inscrits à vos formations et gérez leur progression</p>
+        </div>
+        <div>
+            <span class="badge" style="background: #eef2ff; color: var(--primary); font-weight: 700; font-size: 0.9rem; padding: 0.4rem 0.8rem;">
+                Total : {{ inscriptions.count }} inscription{{ inscriptions.count|pluralize }}
+            </span>
+        </div>
+    </div>
+
+    <!-- Filtres et Recherche -->
+    <form method="get" class="filter-bar" style="margin-top: 1rem;">
+        <div class="filter-group">
+            <div class="search-input-wrapper">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" name="q" value="{{ q }}" class="form-control" placeholder="Rechercher par nom, email ou formation...">
+            </div>
+
+            <!-- Filtre par Formation -->
+            <select name="formation" class="form-control" style="width: auto; height: 40px;" onchange="this.form.submit()">
+                <option value="">Toutes mes formations</option>
+                {% for f in mes_formations %}
+                <option value="{{ f.id }}" {% if selected_formation == f.id|stringformat:"s" %}selected{% endif %}>
+                    {{ f.titre|truncatechars:35 }}
+                </option>
+                {% endfor %}
+            </select>
+
+            <!-- Filtre par Statut -->
+            <select name="statut" class="form-control" style="width: auto; height: 40px;" onchange="this.form.submit()">
+                <option value="">Tous les statuts</option>
+                <option value="EN ATTENTE" {% if selected_statut == 'EN ATTENTE' %}selected{% endif %}>En attente</option>
+                <option value="CONFIRMEE" {% if selected_statut == 'CONFIRMEE' %}selected{% endif %}>Confirmée</option>
+                <option value="TERMINEE" {% if selected_statut == 'TERMINEE' %}selected{% endif %}>Terminée</option>
+                <option value="ANNULEE" {% if selected_statut == 'ANNULEE' %}selected{% endif %}>Annulée</option>
+            </select>
+
+            <button type="submit" class="btn btn-secondary btn-sm" style="height: 40px;">
+                Filtrer
+            </button>
+
+            {% if q or selected_formation or selected_statut %}
+            <a href="{% url 'formateur:participant_list' %}" class="btn btn-ghost btn-sm" style="height: 40px; display: inline-flex; align-items: center;">
+                Réinitialiser
+            </a>
+            {% endif %}
+        </div>
+    </form>
+
+    <!-- Table des Apprenants -->
+    {% if inscriptions %}
+    <div class="data-table-wrapper" style="margin-top: 1.5rem;">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Apprenant</th>
+                    <th>Formation</th>
+                    <th>Date d'inscription</th>
+                    <th>Statut d'inscription</th>
+                    <th>Certification</th>
+                    <th style="text-align: right;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for insc in inscriptions %}
+                <tr>
+                    <td>
+                        <div style="font-weight: 700; color: var(--text-main);">
+                            {{ insc.candidat.prenom }} {{ insc.candidat.nom }}
+                        </div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted);">
+                            <a href="mailto:{{ insc.candidat.email }}">{{ insc.candidat.email }}</a> &bull; {{ insc.candidat.telephone|default:"Tél non renseigné" }}
+                        </div>
+                    </td>
+                    <td>
+                        <a href="{% url 'formateur:formation_detail' insc.formation.id %}" style="font-weight: 600; color: var(--text-main);">
+                            {{ insc.formation.titre }}
+                        </a>
+                        <div style="font-size: 0.78rem; color: var(--text-muted);">
+                            Du {{ insc.formation.dateDebut|date:"d/m" }} au {{ insc.formation.dateFin|date:"d/m/Y" }}
+                        </div>
+                    </td>
+                    <td>{{ insc.dateInscription|date:"d/m/Y" }}</td>
+                    <td>
+                        <form method="post" action="{% url 'formateur:participant_status_update' insc.id %}" style="display: inline-flex; align-items: center; gap: 0.35rem;">
+                            {% csrf_token %}
+                            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                            <select name="statut" class="form-control" style="height: 32px; font-size: 0.8rem; padding: 0.2rem 0.5rem; width: auto;" onchange="this.form.submit()">
+                                <option value="EN ATTENTE" {% if insc.statut == 'EN ATTENTE' %}selected{% endif %}>En attente</option>
+                                <option value="CONFIRMEE" {% if insc.statut == 'CONFIRMEE' %}selected{% endif %}>Confirmée</option>
+                                <option value="TERMINEE" {% if insc.statut == 'TERMINEE' %}selected{% endif %}>Terminée</option>
+                                <option value="ANNULEE" {% if insc.statut == 'ANNULEE' %}selected{% endif %}>Annulée</option>
+                            </select>
+                        </form>
+                    </td>
+                    <td>
+                        {% if insc.certification %}
+                            <a href="{% url 'formateur:certification_detail' insc.certification.id %}" class="badge" style="background: #d1fae5; color: #047857; font-weight: 700; text-decoration: none;">
+                                <i class="fa-solid fa-certificate"></i> {{ insc.certification.reference }}
+                            </a>
+                        {% else %}
+                            <span class="badge" style="background: #f1f5f9; color: var(--text-light);">Non certifié</span>
+                        {% endif %}
+                    </td>
+                    <td style="text-align: right; white-space: nowrap;">
+                        {% if not insc.certification %}
+                            <a href="{% url 'formateur:certification_issue' %}?inscription={{ insc.id }}" class="btn btn-primary btn-sm" style="font-size: 0.8rem;">
+                                <i class="fa-solid fa-award"></i> Certifier
+                            </a>
+                        {% else %}
+                            <a href="{% url 'formateur:certification_detail' insc.certification.id %}" class="btn btn-ghost btn-sm" title="Voir l'attestation">
+                                <i class="fa-solid fa-eye"></i> Voir
+                            </a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state" style="padding: 3rem 1rem;">
+        <i class="fa-solid fa-user-xmark empty-state-icon"></i>
+        <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.35rem;">Aucun apprenant trouvé</h3>
+        <p class="empty-state-text">
+            {% if q or selected_formation or selected_statut %}
+                Aucune inscription ne correspond aux filtres appliqués.
+            {% else %}
+                Vous n'avez pas encore d'inscriptions sur vos cours.
+            {% endif %}
+        </p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

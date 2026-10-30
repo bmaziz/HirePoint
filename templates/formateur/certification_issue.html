@@ -1,0 +1,112 @@
+﻿{% extends 'formateur/base_formateur.html' %}
+{% load static %}
+
+{% block title %}Délivrer une Certification - HirePoint Formateur{% endblock %}
+
+{% block formateur_content %}
+<div class="card" style="max-width: 800px; margin: 0 auto; width: 100%;">
+    <div class="card-header">
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+            <a href="{% url 'formateur:certification_list' %}" class="btn btn-ghost btn-sm">
+                <i class="fa-solid fa-arrow-left"></i> Annuler et retour
+            </a>
+        </div>
+        <h1 class="card-title" style="font-size: 1.5rem;">
+            <i class="fa-solid fa-file-circle-check" style="color: var(--accent-purple);"></i> Délivrer une Certification Officielle
+        </h1>
+        <p class="card-subtitle">
+            Attestation de compétences délivrée à un apprenant ayant validé un de vos programmes.
+        </p>
+    </div>
+
+    <!-- Alertes & Notes explicatives -->
+    <div class="alert alert-info" style="margin-bottom: 1.5rem;">
+        <div class="alert-content">
+            <i class="fa-solid fa-circle-info" style="color: #0284c7; font-size: 1.2rem;"></i>
+            <div style="font-size: 0.9rem; line-height: 1.5;">
+                <strong>Génération automatique :</strong> Chaque certification est dotée d'une <strong>référence unique inviolable</strong> (ex: <code>CERT-2026-XXXXXX</code>) vérifiable sur la plateforme. L'apprenant recevra immédiatement une notification et l'attestation sera ajoutée à son profil.
+            </div>
+        </div>
+    </div>
+
+    {% if form.non_field_errors %}
+    <div class="alert alert-error" style="margin-bottom: 1.5rem;">
+        <div class="alert-content">
+            <i class="fa-solid fa-circle-exclamation" style="color: #dc2626;"></i>
+            <div>
+                {% for err in form.non_field_errors %}
+                <div>{{ err }}</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" novalidate style="display: flex; flex-direction: column; gap: 1.25rem;">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label class="form-label" for="{{ form.inscription.id_for_label }}">
+                {{ form.inscription.label }} <span class="text-danger" style="color: #ef4444;">*</span>
+            </label>
+            {{ form.inscription }}
+            {% if form.inscription.errors %}
+            <span class="form-error" style="color: #ef4444; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                {{ form.inscription.errors.0 }}
+            </span>
+            {% endif %}
+            <span style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.25rem; display: block;">
+                Seuls les candidats inscrits à vos formations et n'ayant pas encore reçu de certification pour cette session apparaissent.
+            </span>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="{{ form.titre.id_for_label }}">
+                {{ form.titre.label }} <span class="text-danger" style="color: #ef4444;">*</span>
+            </label>
+            {{ form.titre }}
+            {% if form.titre.errors %}
+            <span class="form-error" style="color: #ef4444; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                {{ form.titre.errors.0 }}
+            </span>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="{{ form.dateObtention.id_for_label }}">
+                {{ form.dateObtention.label }} <span class="text-danger" style="color: #ef4444;">*</span>
+            </label>
+            {{ form.dateObtention }}
+            {% if form.dateObtention.errors %}
+            <span class="form-error" style="color: #ef4444; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                {{ form.dateObtention.errors.0 }}
+            </span>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="{{ form.fichier.id_for_label }}">
+                {{ form.fichier.label }}
+            </label>
+            {{ form.fichier }}
+            {% if form.fichier.errors %}
+            <span class="form-error" style="color: #ef4444; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                {{ form.fichier.errors.0 }}
+            </span>
+            {% endif %}
+            <span style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.25rem; display: block;">
+                Optionnel : Vous pouvez joindre un document PDF ou image officiel. Si aucun fichier n'est téléversé, une attestation numérique signée HirePoint sera automatiquement générée.
+            </span>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1rem; border-top: 1px solid var(--border-color); padding-top: 1.25rem;">
+            <a href="{% url 'formateur:certification_list' %}" class="btn btn-ghost">
+                Annuler
+            </a>
+            <button type="submit" class="btn btn-primary" id="btn-submit-cert" style="min-width: 180px;">
+                <i class="fa-solid fa-award"></i> Émettre la certification
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

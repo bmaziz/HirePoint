@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+﻿from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
@@ -202,24 +202,8 @@ def dashboard_view(request):
             })
 
     elif user.is_formateur:
-        formateur_obj = getattr(user, 'formateur', None)
-        if formateur_obj:
-            mes_formations = Formation.objects.filter(formateur=formateur_obj).order_by('-dateDebut')
-            inscriptions_recues = Inscription.objects.filter(
-                formation__formateur=formateur_obj
-            ).select_related('candidat', 'formation').order_by('-dateInscription')[:6]
-
-            total_apprenants = Inscription.objects.filter(formation__formateur=formateur_obj).count()
-            total_certifs = Certification.objects.filter(inscription__formation__formateur=formateur_obj).count()
-
-            context.update({
-                'formateur_obj': formateur_obj,
-                'mes_formations': mes_formations[:5],
-                'mes_formations_count': mes_formations.count(),
-                'inscriptions_recues': inscriptions_recues,
-                'total_apprenants': total_apprenants,
-                'total_certifs': total_certifs,
-            })
+        from formateur.views import dashboard_view as formateur_dashboard
+        return formateur_dashboard(request)
 
     else:
         # Administrateur ou staff

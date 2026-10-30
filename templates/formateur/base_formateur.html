@@ -1,0 +1,118 @@
+﻿{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/formateur.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="formateur-wrapper">
+    <!-- Sidebar Navigation Formateur -->
+    <aside class="formateur-sidebar" id="formateur-sidebar">
+        <div class="sidebar-profile">
+            <div class="sidebar-avatar">
+                {{ user.username|slice:":1"|upper }}
+            </div>
+            <div class="sidebar-name">{{ user.display_name }}</div>
+            <div class="sidebar-role">
+                <i class="fa-solid fa-chalkboard-user" style="color: var(--primary);"></i>
+                <span>{{ user.formateur.specialite|default:"Formateur Certifié" }}</span>
+            </div>
+        </div>
+
+        <ul class="sidebar-nav">
+            <li class="sidebar-nav-heading">Général</li>
+            <li>
+                <a href="{% url 'formateur:dashboard' %}" class="sidebar-link {% if active_menu == 'dashboard' %}active{% endif %}">
+                    <span class="sidebar-link-left">
+                        <i class="fa-solid fa-gauge-high"></i>
+                        <span>Tableau de bord</span>
+                    </span>
+                </a>
+            </li>
+
+            <li class="sidebar-nav-heading">Formations</li>
+            <li>
+                <a href="{% url 'formateur:formation_list' %}" class="sidebar-link {% if active_menu == 'formations' %}active{% endif %}">
+                    <span class="sidebar-link-left">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                        <span>Mes Formations</span>
+                    </span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'formateur:formation_create' %}" class="sidebar-link {% if active_menu == 'formations_create' %}active{% endif %}">
+                    <span class="sidebar-link-left">
+                        <i class="fa-solid fa-circle-plus"></i>
+                        <span>Créer une session</span>
+                    </span>
+                </a>
+            </li>
+
+            <li class="sidebar-nav-heading">Apprenants</li>
+            <li>
+                <a href="{% url 'formateur:participant_list' %}" class="sidebar-link {% if active_menu == 'participants' %}active{% endif %}">
+                    <span class="sidebar-link-left">
+                        <i class="fa-solid fa-user-group"></i>
+                        <span>Suivi Apprenants</span>
+                    </span>
+                </a>
+            </li>
+
+            <li class="sidebar-nav-heading">Certifications</li>
+            <li>
+                <a href="{% url 'formateur:certification_list' %}" class="sidebar-link {% if active_menu == 'certifications' %}active{% endif %}">
+                    <span class="sidebar-link-left">
+                        <i class="fa-solid fa-award"></i>
+                        <span>Certifications émises</span>
+                    </span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'formateur:certification_issue' %}" class="sidebar-link {% if active_menu == 'certifications_issue' %}active{% endif %}">
+                    <span class="sidebar-link-left">
+                        <i class="fa-solid fa-file-circle-check"></i>
+                        <span>Délivrer un certificat</span>
+                    </span>
+                </a>
+            </li>
+
+            <li class="sidebar-nav-heading">Communication</li>
+            <li>
+                <a href="{% url 'formateur:notification_list' %}" class="sidebar-link {% if active_menu == 'notifications' %}active{% endif %}">
+                    <span class="sidebar-link-left">
+                        <i class="fa-solid fa-bell"></i>
+                        <span>Notifications</span>
+                    </span>
+                    {% if user.notifications.filter.count %}
+                        <!-- dynamic unread badge handled in context -->
+                    {% endif %}
+                </a>
+            </li>
+
+            <li class="sidebar-nav-heading">Mon Compte</li>
+            <li>
+                <a href="{% url 'formateur:profile' %}" class="sidebar-link {% if active_menu == 'profile' %}active{% endif %}">
+                    <span class="sidebar-link-left">
+                        <i class="fa-solid fa-user"></i>
+                        <span>Mon Profil</span>
+                    </span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'formateur:profile_edit' %}" class="sidebar-link {% if active_menu == 'profile_edit' %}active{% endif %}">
+                    <span class="sidebar-link-left">
+                        <i class="fa-solid fa-user-pen"></i>
+                        <span>Modifier mes infos</span>
+                    </span>
+                </a>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- Main Content Area -->
+    <section class="formateur-content" id="formateur-main-content">
+        {% block formateur_content %}{% endblock %}
+    </section>
+</div>
+{% endblock %}

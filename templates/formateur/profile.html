@@ -1,0 +1,124 @@
+﻿{% extends 'formateur/base_formateur.html' %}
+{% load static %}
+
+{% block title %}Mon Profil Formateur - HirePoint{% endblock %}
+
+{% block formateur_content %}
+<div class="card" style="max-width: 900px; margin: 0 auto; width: 100%;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1.5rem; margin-bottom: 1.5rem;">
+        <div style="display: flex; align-items: center; gap: 1.25rem;">
+            <div class="sidebar-avatar" style="width: 80px; height: 80px; font-size: 2.2rem; margin: 0;">
+                {{ formateur.username|slice:":1"|upper }}
+            </div>
+            <div>
+                <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                    <h1 class="card-title" style="font-size: 1.6rem; margin: 0;">
+                        {{ formateur.prenom }} {{ formateur.nom }}
+                    </h1>
+                    <span class="badge badge-formateur"><i class="fa-solid fa-chalkboard-user"></i> Formateur</span>
+                </div>
+                <div style="font-size: 1.05rem; font-weight: 600; color: var(--primary); margin-top: 0.25rem;">
+                    {{ formateur.specialite }}
+                </div>
+                <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem;">
+                    <i class="fa-regular fa-calendar-check"></i> Membre formateur depuis le {{ formateur.dateInscription|date:"d F Y" }}
+                </div>
+            </div>
+        </div>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <a href="{% url 'formateur:profile_edit' %}" class="btn btn-primary btn-sm">
+                <i class="fa-solid fa-user-pen"></i> Modifier mon profil
+            </a>
+            <a href="{% url 'password_change' %}" class="btn btn-secondary btn-sm">
+                <i class="fa-solid fa-key"></i> Mot de passe
+            </a>
+        </div>
+    </div>
+
+    <!-- Statistiques d'enseignement -->
+    <div class="dashboard-kpis" style="margin-bottom: 1.75rem;">
+        <div class="kpi-card">
+            <div class="kpi-icon" style="background: #d1fae5; color: #047857;">
+                <i class="fa-solid fa-graduation-cap"></i>
+            </div>
+            <div>
+                <div class="kpi-value">{{ formations_count }}</div>
+                <div class="kpi-label">Formations dispensées</div>
+            </div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-icon" style="background: #dbeafe; color: #1d4ed8;">
+                <i class="fa-solid fa-user-group"></i>
+            </div>
+            <div>
+                <div class="kpi-value">{{ participants_count }}</div>
+                <div class="kpi-label">Apprenants formés</div>
+            </div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-icon" style="background: #ede9fe; color: #6d28d9;">
+                <i class="fa-solid fa-award"></i>
+            </div>
+            <div>
+                <div class="kpi-value">{{ certifications_count }}</div>
+                <div class="kpi-label">Certifications émises</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Coordonnées et Détails Professionnels -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; margin-bottom: 1.75rem;">
+        <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.25rem;">
+            <h3 style="font-size: 1rem; font-weight: 700; color: var(--text-main); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fa-solid fa-id-card-clip" style="color: var(--primary);"></i> Coordonnées de contact
+            </h3>
+            <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.75rem; font-size: 0.92rem;">
+                <li>
+                    <span style="color: var(--text-muted); font-size: 0.8rem; display: block;">Adresse email</span>
+                    <strong><a href="mailto:{{ formateur.email }}">{{ formateur.email }}</a></strong>
+                </li>
+                <li>
+                    <span style="color: var(--text-muted); font-size: 0.8rem; display: block;">Téléphone</span>
+                    <strong>{{ formateur.telephone|default:"Non renseigné" }}</strong>
+                </li>
+                <li>
+                    <span style="color: var(--text-muted); font-size: 0.8rem; display: block;">Expérience professionnelle</span>
+                    <strong>{{ formateur.experience|default:"Expert formateur" }}</strong>
+                </li>
+            </ul>
+        </div>
+
+        <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.25rem;">
+            <h3 style="font-size: 1rem; font-weight: 700; color: var(--text-main); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fa-solid fa-award" style="color: #8b5cf6;"></i> Informations de certification
+            </h3>
+            <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.75rem; font-size: 0.92rem;">
+                <li>
+                    <span style="color: var(--text-muted); font-size: 0.8rem; display: block;">Statut instructeur</span>
+                    <span class="badge" style="background: #d1fae5; color: #047857; font-weight: 700;">Agrément Vérifié</span>
+                </li>
+                <li>
+                    <span style="color: var(--text-muted); font-size: 0.8rem; display: block;">Nom d'utilisateur</span>
+                    <code>{{ formateur.username }}</code>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Biographie -->
+    <div style="border-top: 1px solid var(--border-color); padding-top: 1.25rem;">
+        <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+            <i class="fa-solid fa-paragraph" style="color: var(--secondary);"></i> Biographie et parcours pédagogique
+        </h3>
+        {% if formateur.bio %}
+        <p style="font-size: 0.95rem; color: #334155; line-height: 1.7; white-space: pre-line;">
+            {{ formateur.bio }}
+        </p>
+        {% else %}
+        <p style="font-size: 0.9rem; color: var(--text-muted); font-style: italic;">
+            Aucune biographie renseignée pour le moment. Vous pouvez compléter votre présentation via le bouton « Modifier mon profil ».
+        </p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

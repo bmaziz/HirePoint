@@ -1,0 +1,139 @@
+﻿{% extends 'formateur/base_formateur.html' %}
+{% load static %}
+
+{% block title %}Modifier mon Profil - HirePoint Formateur{% endblock %}
+
+{% block formateur_content %}
+<div class="card" style="max-width: 800px; margin: 0 auto; width: 100%;">
+    <div class="card-header">
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+            <a href="{% url 'formateur:profile' %}" class="btn btn-ghost btn-sm">
+                <i class="fa-solid fa-arrow-left"></i> Annuler et retour
+            </a>
+        </div>
+        <h1 class="card-title" style="font-size: 1.5rem;">
+            <i class="fa-solid fa-user-pen" style="color: var(--primary);"></i> Modifier mes Informations de Formateur
+        </h1>
+        <p class="card-subtitle">
+            Mettez à jour vos informations de contact, votre spécialité et votre biographie.
+        </p>
+    </div>
+
+    {% if form.non_field_errors %}
+    <div class="alert alert-error" style="margin-bottom: 1.5rem;">
+        <div class="alert-content">
+            <i class="fa-solid fa-circle-exclamation" style="color: #dc2626;"></i>
+            <div>
+                {% for err in form.non_field_errors %}
+                <div>{{ err }}</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <form method="post" novalidate style="display: flex; flex-direction: column; gap: 1.25rem; margin-top: 1rem;">
+        {% csrf_token %}
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem;">
+            <div class="form-group">
+                <label class="form-label" for="{{ form.prenom.id_for_label }}">
+                    {{ form.prenom.label }} <span class="text-danger" style="color: #ef4444;">*</span>
+                </label>
+                {{ form.prenom }}
+                {% if form.prenom.errors %}
+                <span class="form-error" style="color: #ef4444; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                    {{ form.prenom.errors.0 }}
+                </span>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="{{ form.nom.id_for_label }}">
+                    {{ form.nom.label }} <span class="text-danger" style="color: #ef4444;">*</span>
+                </label>
+                {{ form.nom }}
+                {% if form.nom.errors %}
+                <span class="form-error" style="color: #ef4444; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                    {{ form.nom.errors.0 }}
+                </span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="{{ form.email.id_for_label }}">
+                {{ form.email.label }} <span class="text-danger" style="color: #ef4444;">*</span>
+            </label>
+            {{ form.email }}
+            {% if form.email.errors %}
+            <span class="form-error" style="color: #ef4444; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                {{ form.email.errors.0 }}
+            </span>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="{{ form.specialite.id_for_label }}">
+                {{ form.specialite.label }} <span class="text-danger" style="color: #ef4444;">*</span>
+            </label>
+            {{ form.specialite }}
+            {% if form.specialite.errors %}
+            <span class="form-error" style="color: #ef4444; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                {{ form.specialite.errors.0 }}
+            </span>
+            {% endif %}
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem;">
+            <div class="form-group">
+                <label class="form-label" for="{{ form.telephone.id_for_label }}">
+                    {{ form.telephone.label }}
+                </label>
+                {{ form.telephone }}
+                {% if form.telephone.errors %}
+                <span class="form-error" style="color: #ef4444; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                    {{ form.telephone.errors.0 }}
+                </span>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="{{ form.experience.id_for_label }}">
+                    {{ form.experience.label }}
+                </label>
+                {{ form.experience }}
+                {% if form.experience.errors %}
+                <span class="form-error" style="color: #ef4444; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                    {{ form.experience.errors.0 }}
+                </span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="{{ form.bio.id_for_label }}">
+                {{ form.bio.label }}
+            </label>
+            {{ form.bio }}
+            {% if form.bio.errors %}
+            <span class="form-error" style="color: #ef4444; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                {{ form.bio.errors.0 }}
+            </span>
+            {% endif %}
+            <span style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.2rem; display: block;">
+                Présentez votre parcours d'instructeur, vos certifications et votre méthode pédagogique.
+            </span>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1rem; border-top: 1px solid var(--border-color); padding-top: 1.25rem;">
+            <a href="{% url 'formateur:profile' %}" class="btn btn-ghost">
+                Annuler
+            </a>
+            <button type="submit" class="btn btn-primary" id="btn-save-profile" style="min-width: 180px;">
+                <i class="fa-solid fa-check"></i> Enregistrer mon profil
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

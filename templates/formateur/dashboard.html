@@ -1,0 +1,341 @@
+﻿{% extends 'formateur/base_formateur.html' %}
+{% load static %}
+
+{% block title %}Tableau de bord Formateur - HirePoint{% endblock %}
+
+{% block formateur_content %}
+<!-- Bannière d'accueil du formateur -->
+<div class="formateur-header">
+    <div class="formateur-title-area">
+        <h1 class="formateur-title">
+            <span>Bienvenue, {{ formateur.prenom }} {{ formateur.nom }} !</span>
+            <span class="badge badge-formateur"><i class="fa-solid fa-chalkboard-user"></i> Formateur</span>
+        </h1>
+        <p class="formateur-subtitle">
+            <i class="fa-solid fa-certificate"></i> Spécialité : <strong>{{ formateur.specialite }}</strong> &bull; Espace Pédagogique HirePoint
+        </p>
+    </div>
+    <div class="formateur-header-actions">
+        <a href="{% url 'formateur:formation_create' %}" class="btn btn-primary" style="background: #ffffff; color: var(--primary); font-weight: 700; border: none; box-shadow: var(--shadow-md);">
+            <i class="fa-solid fa-circle-plus"></i> Nouvelle Formation
+        </a>
+        <a href="{% url 'formateur:profile' %}" class="btn btn-secondary" style="background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.3);">
+            <i class="fa-solid fa-id-card"></i> Mon Profil
+        </a>
+    </div>
+</div>
+
+<!-- Métriques Clés (KPIs en temps réel) -->
+<div class="dashboard-kpis">
+    <div class="kpi-card">
+        <div class="kpi-icon" style="background: #d1fae5; color: #047857;">
+            <i class="fa-solid fa-graduation-cap"></i>
+        </div>
+        <div>
+            <div class="kpi-value">{{ total_formations }}</div>
+            <div class="kpi-label">Formations créées</div>
+        </div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-icon" style="background: #dbeafe; color: #1d4ed8;">
+            <i class="fa-solid fa-user-group"></i>
+        </div>
+        <div>
+            <div class="kpi-value">{{ total_participants }}</div>
+            <div class="kpi-label">Inscriptions totales</div>
+        </div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-icon" style="background: #ede9fe; color: #6d28d9;">
+            <i class="fa-solid fa-award"></i>
+        </div>
+        <div>
+            <div class="kpi-value">{{ total_certifications }}</div>
+            <div class="kpi-label">Certifications délivrées</div>
+        </div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-icon" style="background: #fef3c7; color: #b45309;">
+            <i class="fa-solid fa-clock"></i>
+        </div>
+        <div>
+            <div class="kpi-value">{{ inscriptions_en_attente }}</div>
+            <div class="kpi-label">Inscriptions en attente</div>
+        </div>
+    </div>
+</div>
+
+<!-- Actions Rapides -->
+<div class="quick-actions-grid">
+    <a href="{% url 'formateur:formation_create' %}" class="quick-action-card">
+        <div class="quick-action-icon" style="background: #e0e7ff; color: #4338ca;">
+            <i class="fa-solid fa-plus-circle"></i>
+        </div>
+        <div class="quick-action-info">
+            <span class="quick-action-title">Créer une session</span>
+            <span class="quick-action-desc">Nouveau programme</span>
+        </div>
+    </a>
+    <a href="{% url 'formateur:formation_list' %}" class="quick-action-card">
+        <div class="quick-action-icon" style="background: #dcfce7; color: #15803d;">
+            <i class="fa-solid fa-book-bookmark"></i>
+        </div>
+        <div class="quick-action-info">
+            <span class="quick-action-title">Gérer mes cours</span>
+            <span class="quick-action-desc">Catalogue complet</span>
+        </div>
+    </a>
+    <a href="{% url 'formateur:participant_list' %}" class="quick-action-card">
+        <div class="quick-action-icon" style="background: #e0f2fe; color: #0369a1;">
+            <i class="fa-solid fa-users-gear"></i>
+        </div>
+        <div class="quick-action-info">
+            <span class="quick-action-title">Voir apprenants</span>
+            <span class="quick-action-desc">Suivi et statuts</span>
+        </div>
+    </a>
+    <a href="{% url 'formateur:certification_issue' %}" class="quick-action-card">
+        <div class="quick-action-icon" style="background: #fae8ff; color: #a21caf;">
+            <i class="fa-solid fa-certificate"></i>
+        </div>
+        <div class="quick-action-info">
+            <span class="quick-action-title">Délivrer certificat</span>
+            <span class="quick-action-desc">Attribution officielle</span>
+        </div>
+    </a>
+    <a href="{% url 'formateur:profile_edit' %}" class="quick-action-card">
+        <div class="quick-action-icon" style="background: #f1f5f9; color: #475569;">
+            <i class="fa-solid fa-user-pen"></i>
+        </div>
+        <div class="quick-action-info">
+            <span class="quick-action-title">Éditer profil</span>
+            <span class="quick-action-desc">Infos & bio</span>
+        </div>
+    </a>
+</div>
+
+<!-- Grille Principale du Tableau de Bord -->
+<div class="dashboard-grid">
+    <!-- Colonne Principale (Gauche) -->
+    <div style="display: flex; flex-direction: column; gap: 1.75rem;">
+        <!-- Mes Sessions de Formation -->
+        <div class="card">
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h2 class="card-title" style="font-size: 1.25rem;">
+                        <i class="fa-solid fa-chalkboard-user" style="color: var(--primary);"></i> Mes Sessions Récentes
+                    </h2>
+                    <p class="card-subtitle">Aperçu de vos programmes de formation actifs ou récents</p>
+                </div>
+                <a href="{% url 'formateur:formation_list' %}" class="btn btn-ghost btn-sm">
+                    Voir tout <i class="fa-solid fa-arrow-right" style="margin-left: 0.35rem;"></i>
+                </a>
+            </div>
+
+            {% if recent_formations %}
+            <div class="data-table-wrapper">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Titre de la formation</th>
+                            <th>Domaine</th>
+                            <th>Période</th>
+                            <th>Inscrits</th>
+                            <th style="text-align: right;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for f in recent_formations %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'formateur:formation_detail' f.id %}" style="font-weight: 700; color: var(--text-main);">
+                                    {{ f.titre }}
+                                </a>
+                                <div style="font-size: 0.8rem; color: var(--text-muted);">{{ f.niveau }} &bull; {{ f.duree }}h</div>
+                            </td>
+                            <td><span class="badge" style="background: #f1f5f9; color: var(--text-main);">{{ f.domaine }}</span></td>
+                            <td>
+                                <div style="font-size: 0.85rem;">Du {{ f.dateDebut|date:"d/m" }} au {{ f.dateFin|date:"d/m/Y" }}</div>
+                            </td>
+                            <td>
+                                <span class="badge" style="background: #e0f2fe; color: #0369a1; font-weight: 700;">
+                                    {{ f.inscriptions.count }} / {{ f.nombrePlaces }}
+                                </span>
+                            </td>
+                            <td style="text-align: right;">
+                                <a href="{% url 'formateur:formation_detail' f.id %}" class="btn btn-ghost btn-sm" title="Consulter">
+                                    <i class="fa-solid fa-eye"></i>
+                                </a>
+                                <a href="{% url 'formateur:formation_update' f.id %}" class="btn btn-ghost btn-sm" title="Modifier">
+                                    <i class="fa-solid fa-pen"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <i class="fa-solid fa-graduation-cap empty-state-icon"></i>
+                <p class="empty-state-text">Vous n'avez pas encore créé de session de formation.</p>
+                <a href="{% url 'formateur:formation_create' %}" class="btn btn-primary btn-sm" style="margin-top: 1rem;">
+                    <i class="fa-solid fa-plus"></i> Créer ma première formation
+                </a>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Derniers Apprenants Inscrits -->
+        <div class="card">
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h2 class="card-title" style="font-size: 1.25rem;">
+                        <i class="fa-solid fa-users" style="color: var(--secondary);"></i> Derniers Apprenants Inscrits
+                    </h2>
+                    <p class="card-subtitle">Candidats ayant rejoint l'un de vos cours</p>
+                </div>
+                <a href="{% url 'formateur:participant_list' %}" class="btn btn-ghost btn-sm">
+                    Tous les apprenants <i class="fa-solid fa-arrow-right" style="margin-left: 0.35rem;"></i>
+                </a>
+            </div>
+
+            {% if recent_inscriptions %}
+            <div class="data-table-wrapper">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Candidat</th>
+                            <th>Formation suivie</th>
+                            <th>Date d'inscription</th>
+                            <th>Statut</th>
+                            <th style="text-align: right;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for insc in recent_inscriptions %}
+                        <tr>
+                            <td>
+                                <div style="font-weight: 700;">{{ insc.candidat.prenom }} {{ insc.candidat.nom }}</div>
+                                <div style="font-size: 0.8rem; color: var(--text-muted);">{{ insc.candidat.email }}</div>
+                            </td>
+                            <td>{{ insc.formation.titre|truncatechars:35 }}</td>
+                            <td>{{ insc.dateInscription|date:"d/m/Y" }}</td>
+                            <td>
+                                <span class="badge-status 
+                                    {% if insc.statut == 'CONFIRMEE' %}badge-status-confirmed
+                                    {% elif insc.statut == 'TERMINEE' %}badge-status-completed
+                                    {% elif insc.statut == 'ANNULEE' %}badge-status-cancelled
+                                    {% else %}badge-status-waiting{% endif %}">
+                                    {{ insc.statut }}
+                                </span>
+                            </td>
+                            <td style="text-align: right;">
+                                {% if not insc.certification %}
+                                <a href="{% url 'formateur:certification_issue' %}?inscription={{ insc.id }}" class="btn btn-ghost btn-sm" title="Délivrer certificat">
+                                    <i class="fa-solid fa-award" style="color: var(--accent-purple);"></i>
+                                </a>
+                                {% else %}
+                                <a href="{% url 'formateur:certification_detail' insc.certification.id %}" class="btn btn-ghost btn-sm" title="Voir certificat">
+                                    <i class="fa-solid fa-file-lines" style="color: #059669;"></i>
+                                </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <i class="fa-solid fa-user-clock empty-state-icon"></i>
+                <p class="empty-state-text">Aucun apprenant inscrit pour l'instant.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Colonne Latérale (Droite) -->
+    <div style="display: flex; flex-direction: column; gap: 1.75rem;">
+        <!-- Dernières Certifications Émises -->
+        <div class="card">
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                <h3 class="card-title" style="font-size: 1.15rem;">
+                    <i class="fa-solid fa-award" style="color: #8b5cf6;"></i> Certifications
+                </h3>
+                <a href="{% url 'formateur:certification_list' %}" class="btn btn-ghost btn-sm" style="padding: 0.2rem 0.5rem; font-size: 0.8rem;">
+                    Voir tout
+                </a>
+            </div>
+
+            {% if recent_certifications %}
+                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    {% for cert in recent_certifications %}
+                    <div style="padding: 0.85rem; background: #f8fafc; border-radius: var(--radius-md); border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-weight: 700; font-size: 0.92rem;">
+                                {{ cert.inscription.candidat.prenom }} {{ cert.inscription.candidat.nom }}
+                            </div>
+                            <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.2rem;">
+                                <code>{{ cert.reference }}</code> &bull; {{ cert.dateObtention|date:"d/m/Y" }}
+                            </div>
+                        </div>
+                        <a href="{% url 'formateur:certification_detail' cert.id %}" class="btn btn-ghost btn-sm" title="Consulter l'attestation">
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p style="font-size: 0.9rem; color: var(--text-muted); text-align: center; padding: 1.5rem 0;">
+                    Aucune certification émise pour le moment.
+                </p>
+                <a href="{% url 'formateur:certification_issue' %}" class="btn btn-secondary btn-sm" style="width: 100%; text-align: center;">
+                    <i class="fa-solid fa-plus"></i> Délivrer une certification
+                </a>
+            {% endif %}
+        </div>
+
+        <!-- Notifications Récentes -->
+        <div class="card">
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                <h3 class="card-title" style="font-size: 1.15rem;">
+                    <i class="fa-solid fa-bell" style="color: #f59e0b;"></i> Notifications
+                    {% if unread_notifications_count > 0 %}
+                    <span class="badge" style="background: #fee2e2; color: #dc2626; font-size: 0.75rem; margin-left: 0.35rem;">
+                        {{ unread_notifications_count }} nouvelle{{ unread_notifications_count|pluralize }}
+                    </span>
+                    {% endif %}
+                </h3>
+                <a href="{% url 'formateur:notification_list' %}" class="btn btn-ghost btn-sm" style="padding: 0.2rem 0.5rem; font-size: 0.8rem;">
+                    Toutes
+                </a>
+            </div>
+
+            {% if recent_notifications %}
+                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    {% for notif in recent_notifications %}
+                    <div style="padding: 0.85rem; background: {% if not notif.lue %}#f0fdf4{% else %}#f8fafc{% endif %}; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                        <div style="font-size: 0.88rem; color: var(--text-main); line-height: 1.4;">
+                            {{ notif.message }}
+                        </div>
+                        <div style="font-size: 0.75rem; color: var(--text-light); margin-top: 0.4rem; display: flex; justify-content: space-between; align-items: center;">
+                            <span><i class="fa-regular fa-clock"></i> {{ notif.dateCreation|date:"d/m/Y H:i" }}</span>
+                            {% if not notif.lue %}
+                            <a href="{% url 'formateur:notification_mark_read' notif.id %}" style="font-size: 0.75rem; font-weight: 700; color: var(--primary);">
+                                Marquer comme lu
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p style="font-size: 0.9rem; color: var(--text-muted); text-align: center; padding: 1.5rem 0;">
+                    Aucune notification reçue.
+                </p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,135 @@
+﻿{% extends 'formateur/base_formateur.html' %}
+{% load static %}
+
+{% block title %}Mes Formations - HirePoint Formateur{% endblock %}
+
+{% block formateur_content %}
+<div class="card">
+    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <h1 class="card-title" style="font-size: 1.45rem;">
+                <i class="fa-solid fa-graduation-cap" style="color: var(--primary);"></i> Mes Sessions de Formation
+            </h1>
+            <p class="card-subtitle">Gérez vos programmes pédagogiques, vos sessions et vos capacités d'accueil</p>
+        </div>
+        <a href="{% url 'formateur:formation_create' %}" class="btn btn-primary" id="btn-create-formation">
+            <i class="fa-solid fa-plus"></i> Créer une formation
+        </a>
+    </div>
+
+    <!-- Barre de filtrage & recherche -->
+    <form method="get" class="filter-bar" style="margin-top: 1rem;">
+        <div class="filter-group">
+            <div class="search-input-wrapper">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" name="q" value="{{ q }}" class="form-control" placeholder="Rechercher par titre, domaine, niveau...">
+            </div>
+            <select name="periode" class="form-control" style="width: auto; height: 40px;" onchange="this.form.submit()">
+                <option value="all" {% if periode == 'all' %}selected{% endif %}>Toutes les périodes</option>
+                <option value="en_cours" {% if periode == 'en_cours' %}selected{% endif %}>Actuellement en cours</option>
+                <option value="a_venir" {% if periode == 'a_venir' %}selected{% endif %}>À venir</option>
+                <option value="terminee" {% if periode == 'terminee' %}selected{% endif %}>Terminées</option>
+            </select>
+            <button type="submit" class="btn btn-secondary btn-sm" style="height: 40px;">
+                Filtrer
+            </button>
+            {% if q or periode != 'all' %}
+            <a href="{% url 'formateur:formation_list' %}" class="btn btn-ghost btn-sm" style="height: 40px; display: inline-flex; align-items: center;">
+                Réinitialiser
+            </a>
+            {% endif %}
+        </div>
+    </form>
+
+    <!-- Tableau des Formations -->
+    {% if formations %}
+    <div class="data-table-wrapper" style="margin-top: 1.5rem;">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Programme</th>
+                    <th>Domaine</th>
+                    <th>Niveau</th>
+                    <th>Volume horaire</th>
+                    <th>Période</th>
+                    <th>Inscriptions / Places</th>
+                    <th>Statut</th>
+                    <th style="text-align: right;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for f in formations %}
+                <tr>
+                    <td>
+                        <a href="{% url 'formateur:formation_detail' f.id %}" style="font-weight: 700; color: var(--text-main); font-size: 0.96rem;">
+                            {{ f.titre }}
+                        </a>
+                        <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.15rem;">
+                            <i class="fa-solid fa-location-dot"></i> {{ f.lieu|default:"En ligne" }}
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge" style="background: #f1f5f9; color: var(--text-main);">
+                            {{ f.domaine }}
+                        </span>
+                    </td>
+                    <td>{{ f.niveau }}</td>
+                    <td>{{ f.duree }} h</td>
+                    <td>
+                        <div style="font-size: 0.86rem; font-weight: 600;">
+                            Du {{ f.dateDebut|date:"d/m/Y" }}<br>au {{ f.dateFin|date:"d/m/Y" }}
+                        </div>
+                    </td>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 0.4rem;">
+                            <span class="badge" style="background: #dbeafe; color: #1e40af; font-weight: 700;">
+                                {{ f.inscriptions.count }} / {{ f.nombrePlaces }}
+                            </span>
+                            {% if f.est_complete %}
+                            <span class="badge" style="background: #fee2e2; color: #991b1b; font-size: 0.72rem;">Complet</span>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td>
+                        {% if f.dateDebut > today %}
+                            <span class="badge-status badge-status-waiting">À venir</span>
+                        {% elif f.dateFin < today %}
+                            <span class="badge-status badge-status-completed">Terminée</span>
+                        {% else %}
+                            <span class="badge-status badge-status-confirmed">En cours</span>
+                        {% endif %}
+                    </td>
+                    <td style="text-align: right; white-space: nowrap;">
+                        <a href="{% url 'formateur:formation_detail' f.id %}" class="btn btn-ghost btn-sm" title="Voir les détails et apprenants">
+                            <i class="fa-solid fa-eye"></i>
+                        </a>
+                        <a href="{% url 'formateur:formation_update' f.id %}" class="btn btn-ghost btn-sm" title="Modifier la formation">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </a>
+                        <a href="{% url 'formateur:formation_delete' f.id %}" class="btn btn-ghost btn-sm text-danger" title="Supprimer la session">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state" style="padding: 3rem 1rem;">
+        <i class="fa-solid fa-folder-open empty-state-icon"></i>
+        <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.35rem;">Aucune session trouvée</h3>
+        <p class="empty-state-text">
+            {% if q or periode != 'all' %}
+                Aucune formation ne correspond à vos critères de recherche.
+            {% else %}
+                Vous n'avez pas encore configuré de programme de formation.
+            {% endif %}
+        </p>
+        <a href="{% url 'formateur:formation_create' %}" class="btn btn-primary" style="margin-top: 1rem;">
+            <i class="fa-solid fa-plus"></i> Créer une session
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

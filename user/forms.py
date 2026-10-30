@@ -1,4 +1,4 @@
-from django import forms
+﻿from django import forms
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from .models import User, Role
@@ -286,11 +286,13 @@ class FormateurProfileForm(forms.ModelForm):
 
     class Meta:
         model = Formateur
-        fields = ['email', 'prenom', 'nom', 'specialite', 'bio']
+        fields = ['email', 'prenom', 'nom', 'specialite', 'telephone', 'experience', 'bio']
         widgets = {
             'prenom': forms.TextInput(attrs={'class': 'form-control'}),
             'nom': forms.TextInput(attrs={'class': 'form-control'}),
             'specialite': forms.TextInput(attrs={'class': 'form-control'}),
+            'telephone': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ex: 06 12 34 56 78'}),
+            'experience': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ex: 5 ans d''experience'}),
             'bio': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
         }
 

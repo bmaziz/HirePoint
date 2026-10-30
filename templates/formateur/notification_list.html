@@ -1,0 +1,87 @@
+﻿{% extends 'formateur/base_formateur.html' %}
+{% load static %}
+
+{% block title %}Centre de Notifications - HirePoint Formateur{% endblock %}
+
+{% block formateur_content %}
+<div class="card">
+    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <h1 class="card-title" style="font-size: 1.45rem;">
+                <i class="fa-solid fa-bell" style="color: #f59e0b;"></i> Centre de Notifications
+            </h1>
+            <p class="card-subtitle">Alertes pédagogiques, nouvelles inscriptions et certifications</p>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+            {% if unread_count > 0 %}
+            <a href="{% url 'formateur:notification_mark_all_read' %}" class="btn btn-secondary btn-sm" id="btn-mark-all-read">
+                <i class="fa-solid fa-check-double"></i> Tout marquer comme lu
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if notifications %}
+    <div style="display: flex; flex-direction: column; gap: 0.85rem; margin-top: 1.5rem;">
+        {% for notif in notifications %}
+        <div class="notification-card {% if not notif.lue %}unread{% endif %}">
+            <div class="notification-icon-box" style="
+                {% if notif.type == 'CERTIFICATION' %}background: #ede9fe; color: #6d28d9;
+                {% elif notif.type == 'FORMATION' %}background: #dbeafe; color: #1d4ed8;
+                {% else %}background: #f1f5f9; color: var(--text-muted);{% endif %}
+            ">
+                {% if notif.type == 'CERTIFICATION' %}
+                    <i class="fa-solid fa-award"></i>
+                {% elif notif.type == 'FORMATION' %}
+                    <i class="fa-solid fa-graduation-cap"></i>
+                {% else %}
+                    <i class="fa-solid fa-bell"></i>
+                {% endif %}
+            </div>
+
+            <div class="notification-body">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+                    <span class="badge" style="
+                        {% if notif.type == 'CERTIFICATION' %}background: #ede9fe; color: #6d28d9;
+                        {% elif notif.type == 'FORMATION' %}background: #dbeafe; color: #1d4ed8;
+                        {% else %}background: #f1f5f9; color: var(--text-muted);{% endif %}
+                        font-size: 0.72rem;
+                    ">
+                        {{ notif.type }}
+                    </span>
+                    <span class="notification-time">
+                        <i class="fa-regular fa-clock"></i> {{ notif.dateCreation|date:"d F Y à H:i" }}
+                    </span>
+                </div>
+
+                <div class="notification-text">
+                    {{ notif.message }}
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem;">
+                    <div>
+                        {% if not notif.lue %}
+                            <span class="badge" style="background: #fee2e2; color: #dc2626; font-size: 0.72rem;">Non lue</span>
+                        {% else %}
+                            <span class="badge" style="background: #f1f5f9; color: var(--text-light); font-size: 0.72rem;">Lue</span>
+                        {% endif %}
+                    </div>
+                    {% if not notif.lue %}
+                    <a href="{% url 'formateur:notification_mark_read' notif.id %}" class="btn btn-ghost btn-sm" style="font-size: 0.8rem; color: var(--primary);">
+                        <i class="fa-solid fa-check"></i> Marquer comme lue
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state" style="padding: 3rem 1rem;">
+        <i class="fa-solid fa-bell-slash empty-state-icon"></i>
+        <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.35rem;">Aucune notification</h3>
+        <p class="empty-state-text">Vous n'avez aucune notification pour l'instant.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

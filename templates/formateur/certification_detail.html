@@ -1,0 +1,72 @@
+﻿{% extends 'formateur/base_formateur.html' %}
+{% load static %}
+
+{% block title %}Certification {{ certification.reference }} - HirePoint{% endblock %}
+
+{% block formateur_content %}
+<div class="no-print" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+    <a href="{% url 'formateur:certification_list' %}" class="btn btn-ghost btn-sm">
+        <i class="fa-solid fa-arrow-left"></i> Retour aux certifications
+    </a>
+    <div style="display: flex; gap: 0.75rem;">
+        {% if certification.fichier %}
+        <a href="{{ certification.fichier.url }}" target="_blank" class="btn btn-secondary btn-sm">
+            <i class="fa-solid fa-file-arrow-down"></i> Télécharger le document joint
+        </a>
+        {% endif %}
+        <button onclick="window.print()" class="btn btn-primary btn-sm" id="btn-print-certificate">
+            <i class="fa-solid fa-print"></i> Imprimer / Enregistrer en PDF
+        </button>
+    </div>
+</div>
+
+<!-- Cadre Officiel du Certificat -->
+<div class="certificate-frame">
+    <div class="certificate-header-seal">
+        <i class="fa-solid fa-award"></i>
+    </div>
+
+    <div style="font-size: 0.9rem; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; color: var(--primary); margin-bottom: 0.5rem;">
+        Plateforme HirePoint &bull; Académie d'Excellence
+    </div>
+
+    <h1 class="certificate-title-main">
+        Attestation de Certification
+    </h1>
+    <div class="certificate-subtitle-main">
+        Cette attestation officielle certifie que l'apprenant(e) a suivi avec succès le parcours :
+    </div>
+
+    <div class="certificate-candidate-name">
+        {{ candidat.prenom }} {{ candidat.nom }}
+    </div>
+
+    <p class="certificate-body-text">
+        a complété avec succès l'ensemble du programme intensif de formation intitulé<br>
+        <strong style="font-size: 1.25rem; color: #1e1b4b; display: block; margin: 0.5rem 0;">« {{ formation.titre }} »</strong>
+        dispensé en mode <strong>{{ formation.lieu|default:"En ligne" }}</strong> pour un volume total de <strong>{{ formation.duree }} heures</strong>, couvrant les aspects théoriques et pratiques du domaine <em>{{ formation.domaine }}</em>.
+    </p>
+
+    <div class="certificate-meta-bar">
+        <div class="certificate-meta-item">
+            <div class="certificate-meta-item-title">Référence Unique Inviolable</div>
+            <div class="certificate-meta-item-val">
+                <code style="font-size: 1.15rem; color: var(--primary);">{{ certification.reference }}</code>
+            </div>
+        </div>
+        <div class="certificate-meta-item">
+            <div class="certificate-meta-item-title">Date de délivrance</div>
+            <div class="certificate-meta-item-val">{{ certification.dateObtention|date:"d F Y" }}</div>
+        </div>
+        <div class="certificate-meta-item">
+            <div class="certificate-meta-item-title">Formateur Agréé</div>
+            <div class="certificate-meta-item-val">{{ formateur.prenom }} {{ formateur.nom }}</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">{{ formateur.specialite }}</div>
+        </div>
+    </div>
+
+    <div style="margin-top: 2.5rem; font-size: 0.78rem; color: var(--text-light); border-top: 1px solid var(--border-color); padding-top: 1rem;">
+        Document numérique officiel signé par l'instructeur &bull; Enregistré dans le registre décentralisé HirePoint &bull; Validité internationale
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,212 @@
+﻿{% extends 'formateur/base_formateur.html' %}
+{% load static %}
+
+{% block title %}
+{% if is_edit %}Modifier la formation : {{ formation.titre }}{% else %}Créer une nouvelle formation{% endif %} - HirePoint
+{% endblock %}
+
+{% block formateur_content %}
+<div class="card" style="max-width: 900px; margin: 0 auto; width: 100%;">
+    <div class="card-header">
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+            <a href="{% if is_edit %}{% url 'formateur:formation_detail' formation.id %}{% else %}{% url 'formateur:formation_list' %}{% endif %}" class="btn btn-ghost btn-sm">
+                <i class="fa-solid fa-arrow-left"></i> Annuler et retour
+            </a>
+        </div>
+        <h1 class="card-title" style="font-size: 1.5rem;">
+            <i class="fa-solid {% if is_edit %}fa-pen-to-square{% else %}fa-circle-plus{% endif %}" style="color: var(--primary);"></i>
+            {% if is_edit %}Modifier la session : {{ formation.titre }}{% else %}Créer un nouveau programme de formation{% endif %}
+        </h1>
+        <p class="card-subtitle">
+            Renseignez les détails pédagogiques et logistiques de votre session.
+        </p>
+    </div>
+
+    {% if form.non_field_errors %}
+    <div class="alert alert-error" style="margin-bottom: 1.5rem;">
+        <div class="alert-content">
+            <i class="fa-solid fa-circle-exclamation" style="color: #dc2626;"></i>
+            <div>
+                {% for err in form.non_field_errors %}
+                <div>{{ err }}</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <form method="post" novalidate style="display: flex; flex-direction: column; gap: 1.5rem; margin-top: 1rem;">
+        {% csrf_token %}
+
+        <!-- Section 1 : Informations Générales -->
+        <div style="border-bottom: 1px solid var(--border-color); padding-bottom: 1.25rem;">
+            <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--text-main); margin-bottom: 1rem;">
+                <i class="fa-solid fa-heading" style="color: var(--primary); margin-right: 0.35rem;"></i> Intitulé & Thématique
+            </h3>
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.titre.id_for_label }}">
+                        {{ form.titre.label }} <span class="text-danger" style="color: #ef4444;">*</span>
+                    </label>
+                    {{ form.titre }}
+                    {% if form.titre.errors %}
+                    <span class="form-error" style="color: #ef4444; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                        {{ form.titre.errors.0 }}
+                    </span>
+                    {% endif %}
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem;">
+                    <div class="form-group">
+                        <label class="form-label" for="{{ form.domaine.id_for_label }}">
+                            {{ form.domaine.label }} <span class="text-danger" style="color: #ef4444;">*</span>
+                        </label>
+                        {{ form.domaine }}
+                        {% if form.domaine.errors %}
+                        <span class="form-error" style="color: #ef4444; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                            {{ form.domaine.errors.0 }}
+                        </span>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="{{ form.niveau.id_for_label }}">
+                            {{ form.niveau.label }} <span class="text-danger" style="color: #ef4444;">*</span>
+                        </label>
+                        {{ form.niveau }}
+                        {% if form.niveau.errors %}
+                        <span class="form-error" style="color: #ef4444; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                            {{ form.niveau.errors.0 }}
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2 : Planning & Capacité -->
+        <div style="border-bottom: 1px solid var(--border-color); padding-bottom: 1.25rem;">
+            <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--text-main); margin-bottom: 1rem;">
+                <i class="fa-solid fa-calendar-check" style="color: var(--secondary); margin-right: 0.35rem;"></i> Planning, Lieu & Capacité
+            </h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.dateDebut.id_for_label }}">
+                        {{ form.dateDebut.label }} <span class="text-danger" style="color: #ef4444;">*</span>
+                    </label>
+                    {{ form.dateDebut }}
+                    {% if form.dateDebut.errors %}
+                    <span class="form-error" style="color: #ef4444; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                        {{ form.dateDebut.errors.0 }}
+                    </span>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.dateFin.id_for_label }}">
+                        {{ form.dateFin.label }} <span class="text-danger" style="color: #ef4444;">*</span>
+                    </label>
+                    {{ form.dateFin }}
+                    {% if form.dateFin.errors %}
+                    <span class="form-error" style="color: #ef4444; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                        {{ form.dateFin.errors.0 }}
+                    </span>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.duree.id_for_label }}">
+                        {{ form.duree.label }} <span class="text-danger" style="color: #ef4444;">*</span>
+                    </label>
+                    {{ form.duree }}
+                    {% if form.duree.errors %}
+                    <span class="form-error" style="color: #ef4444; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                        {{ form.duree.errors.0 }}
+                    </span>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.nombrePlaces.id_for_label }}">
+                        {{ form.nombrePlaces.label }} <span class="text-danger" style="color: #ef4444;">*</span>
+                    </label>
+                    {{ form.nombrePlaces }}
+                    {% if form.nombrePlaces.errors %}
+                    <span class="form-error" style="color: #ef4444; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                        {{ form.nombrePlaces.errors.0 }}
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-top: 1rem;">
+                <label class="form-label" for="{{ form.lieu.id_for_label }}">
+                    {{ form.lieu.label }}
+                </label>
+                {{ form.lieu }}
+                {% if form.lieu.errors %}
+                <span class="form-error" style="color: #ef4444; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                    {{ form.lieu.errors.0 }}
+                </span>
+                {% endif %}
+                <span style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.2rem; display: block;">
+                    Précisez si la session est organisée en distanciel (visio) ou sur site physique.
+                </span>
+            </div>
+        </div>
+
+        <!-- Section 3 : Contenu & Pédagogie -->
+        <div>
+            <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--text-main); margin-bottom: 1rem;">
+                <i class="fa-solid fa-book-open" style="color: #10b981; margin-right: 0.35rem;"></i> Contenu & Pédagogie
+            </h3>
+
+            <div class="form-group" style="margin-bottom: 1rem;">
+                <label class="form-label" for="{{ form.description.id_for_label }}">
+                    {{ form.description.label }} <span class="text-danger" style="color: #ef4444;">*</span>
+                </label>
+                {{ form.description }}
+                {% if form.description.errors %}
+                <span class="form-error" style="color: #ef4444; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                    {{ form.description.errors.0 }}
+                </span>
+                {% endif %}
+            </div>
+
+            <div class="form-group" style="margin-bottom: 1rem;">
+                <label class="form-label" for="{{ form.objectifs.id_for_label }}">
+                    {{ form.objectifs.label }}
+                </label>
+                {{ form.objectifs }}
+                {% if form.objectifs.errors %}
+                <span class="form-error" style="color: #ef4444; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                    {{ form.objectifs.errors.0 }}
+                </span>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="{{ form.prerequis.id_for_label }}">
+                    {{ form.prerequis.label }}
+                </label>
+                {{ form.prerequis }}
+                {% if form.prerequis.errors %}
+                <span class="form-error" style="color: #ef4444; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                    {{ form.prerequis.errors.0 }}
+                </span>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Boutons de validation -->
+        <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1rem; border-top: 1px solid var(--border-color); padding-top: 1.25rem;">
+            <a href="{% if is_edit %}{% url 'formateur:formation_detail' formation.id %}{% else %}{% url 'formateur:formation_list' %}{% endif %}" class="btn btn-ghost">
+                Annuler
+            </a>
+            <button type="submit" class="btn btn-primary" id="btn-submit-formation" style="min-width: 180px;">
+                <i class="fa-solid fa-check"></i> {% if is_edit %}Enregistrer les modifications{% else %}Publier la formation{% endif %}
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
